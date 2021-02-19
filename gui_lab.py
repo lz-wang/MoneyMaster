@@ -1,3 +1,4 @@
+import os
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QColor, QBrush
@@ -47,6 +48,9 @@ class MMGui(QWidget):
         self.btn_read.clicked.connect(self.read_data)
 
     def init_lineedit(self):
+        data_path = os.getcwd() + '/data'
+        wechat_demo = data_path + '/wechat2020Q4.csv'
+        self.ledit_path.setText(wechat_demo)
         pass
 
     def init_textedit(self):
@@ -63,7 +67,7 @@ class MMGui(QWidget):
         self.setLayout(self.grid)
 
     def init_window(self):
-        self.resize(600, 400)
+        self.resize(800, 600)
         self.setWindowTitle('Money Master')
 
     def import_data_file(self):
