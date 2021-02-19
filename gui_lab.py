@@ -1,3 +1,10 @@
+#  Copyright (c) lzwang 2020-2021, All Rights Reserved.
+#  File: gui_lab.py
+#  Project: MoneyMaster
+#  Author: Liangzhuang Wang
+#  Email: zhuangwang82@gmail.com
+#  Last modified: 2021/2/19 下午10:43
+
 import os
 import sys
 from PyQt5.QtCore import Qt
