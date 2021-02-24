@@ -73,7 +73,7 @@ class MySqlite(object):
               ') VALUES (' + _values[0: -1] + ')'
         self.execute_sql(sql)
 
-    def insert_multi_data(self, table_name: str, data: list):
+    def insert_multi_data(self, table_name: str, data):
         for r in data:
             _values = ''
             for v in r:

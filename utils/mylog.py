@@ -2,12 +2,11 @@
 #  File info: mylog.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/21 上午10:48
+#  Last modified: 2021/2/24 下午9:27
 
 
-import logging
-from logging import handlers
 import datetime
+import logging
 import os
 
 LOG_FOLDER = "/logs"

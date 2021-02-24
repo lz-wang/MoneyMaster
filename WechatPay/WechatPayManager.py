@@ -1,23 +1,30 @@
 #  Copyright (c) lzwang 2020-2021, All Rights Reserved.
-#  File info: wechat.py in MoneyMaster (version 0.1)
+#  File info: WechatPayManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/2/21 上午10:48
+import csv
 import os
 import re
-import csv
-import datetime
-from mylog import Logger
+
+from WechatPay.WechatPayModel import WechatPayData, WechatPayDB
+from MoneyDB.SQLiteManager import MySqlite
+from utils.mylog import Logger
 
 
-class WechatManager:
+class DataManager:
     def __init__(self):
         self.log = Logger(to_file=False).logger
         self.csv_head = None
         self.wechat_data = WechatPayData()
-        pass
+        self.wechat_db = WechatPayDB()
+        self.db_path = os.path.join(os.getcwd(), 'data/database/'+self.wechat_db.db_name)
+        self.db = MySqlite(self.db_path)
 
-    def read_data(self, file_name):
+    def read_csv_data(self, file_name):
+        self.wechat_data.statistics.clear()
+        self.wechat_data.data.clear()
+        self.csv_head = None
         with open(file_name) as f:
             f_csv = csv.reader(f)
             # headers = next(f_csv)
@@ -26,14 +33,12 @@ class WechatManager:
                 if self.csv_head is None:
                     self.find_statistics(row)
                 else:
-                    self.log.info(row)
+                    # self.log.info(row)
                     self.wechat_data.data.append(row)
-                if row[0] == '----------------------微信支付账单明细列表--------------------':
+                if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
                     self.csv_head = next(f_csv)
                     self.wechat_data.data.append(self.csv_head)
                 row_idx += 1
-
-        pass
 
     def find_statistics(self, row_data):
         # 匹配方括号内的字符串
@@ -66,8 +71,17 @@ class WechatManager:
                 self.wechat_data.statistics['other_num'] = re.findall(p2, data)[0]
                 self.wechat_data.statistics['other_amount'] = re.findall(p2, data)[1]
 
-    def write_data(self):
+    def write_data_to_db(self, data):
+        self.log.info('--WRITE to DB---')
+        print(self.db_path)
+        self.db.connect_db()
+        self.db.creat_table(self.wechat_db.table_name, self.wechat_db.table_attr)
+
+        self.db.insert_data(self.wechat_db.table_name, data[1:])
         pass
+
+    def clear_db_data(self):
+        self.db.clear_table(self.wechat_db.table_name)
 
     def clean_data(self):
         pass
@@ -76,28 +90,10 @@ class WechatManager:
         pass
 
 
-class WechatPayData(object):
-    def __init__(self):
-        self.statistics = {
-            'usr_name': '',
-            'start_time': '',
-            'end_time': '',
-            'export_time': '',
-            'trans_num': 0,
-            'income_num': 0,
-            'income_amount': 0,
-            'expense_num': 0,
-            'expense_amount': 0,
-            'other_num': 0,
-            'other_amount': 0
-        }
-        self.data: list = []
-
-
 if __name__ == '__main__':
     print('')
-    cur_path = os.getcwd()
-    wechat_data = cur_path + '/data/wechat/wechat2020Q4.csv'
-    wm = WechatManager()
+    data_path = os.path.join(os.getcwd(), '../data')
+    wechat_data = data_path + '/wechat/wechat2020Q4.csv'
+    wm = DataManager()
     wm.log.info(wechat_data)
-    wm.read_data(wechat_data)
+    wm.read_csv_data(wechat_data)
