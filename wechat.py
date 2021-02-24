@@ -1,9 +1,8 @@
 #  Copyright (c) lzwang 2020-2021, All Rights Reserved.
-#  File: wechat.py
-#  Project: MoneyMaster
+#  File info: wechat.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/20 上午12:19
+#  Last modified: 2021/2/21 上午10:48
 import os
 import re
 import csv
@@ -13,7 +12,7 @@ from mylog import Logger
 
 class WechatManager:
     def __init__(self):
-        self.log = Logger().logger
+        self.log = Logger(to_file=False).logger
         self.csv_head = None
         self.wechat_data = WechatPayData()
         pass

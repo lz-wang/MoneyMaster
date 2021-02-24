@@ -1,7 +1,6 @@
 #  Copyright (c) lzwang 2020-2021, All Rights Reserved.
-#  File: alipay.py
-#  Project: MoneyMaster
+#  File info: alipay.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/17 下午4:16
+#  Last modified: 2021/2/20 上午12:24
 

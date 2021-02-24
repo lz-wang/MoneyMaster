@@ -1,9 +1,8 @@
 #  Copyright (c) lzwang 2020-2021, All Rights Reserved.
-#  File: mylog.py
-#  Project: MoneyMaster
+#  File info: mylog.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/20 上午12:09
+#  Last modified: 2021/2/21 上午10:48
 
 
 import logging
@@ -26,7 +25,7 @@ class Logger(object):
         'crit': logging.CRITICAL
     }  # 日志级别关系映射
 
-    def __init__(self, filename=LOG_FILE_NAME, level='debug'):
+    def __init__(self, filename=LOG_FILE_NAME, level='debug', to_file=True):
         log_path = os.getcwd() + LOG_FOLDER
         if not os.path.exists(log_path):
             os.mkdir(log_path)
@@ -52,9 +51,10 @@ class Logger(object):
         # self.logger.addHandler(th)
 
         # 以日期为名称的log文件输出
-        fh = logging.FileHandler(filename=log_file, encoding='utf-8')
-        fh.setFormatter(self._log_fmt)
-        self.logger.addHandler(fh)
+        if to_file:
+            fh = logging.FileHandler(filename=log_file, encoding='utf-8')
+            fh.setFormatter(self._log_fmt)
+            self.logger.addHandler(fh)
 
 
 if __name__ == '__main__':
