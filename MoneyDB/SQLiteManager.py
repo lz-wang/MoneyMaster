@@ -90,6 +90,11 @@ class MySqlite(object):
     def query_data(self, table_name: str, condition):
         pass
 
+    def query_all_data(self, table_name: str):
+        sql = 'SELECT * FROM ' + table_name
+        self.execute_sql(sql)
+        return self.cur.fetchall()
+
     def execute_sql(self, sql: str):
         try:
             print('***** execute SQL: ' + sql)

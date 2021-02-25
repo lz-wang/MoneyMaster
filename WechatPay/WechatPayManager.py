@@ -6,6 +6,8 @@
 import csv
 import os
 import re
+import time
+import copy
 
 from WechatPay.WechatPayModel import WechatPayData, WechatPayDB
 from MoneyDB.SQLiteManager import MySqlite
@@ -20,25 +22,31 @@ class DataManager:
         self.wechat_db = WechatPayDB()
         self.db_path = os.path.join(os.getcwd(), 'data/database/'+self.wechat_db.db_name)
         self.db = MySqlite(self.db_path)
+        self.db.connect_db()
 
-    def read_csv_data(self, file_name):
+    def read_csv_data(self, file_names_text):
         self.wechat_data.statistics.clear()
         self.wechat_data.data.clear()
-        self.csv_head = None
-        with open(file_name) as f:
-            f_csv = csv.reader(f)
-            # headers = next(f_csv)
-            row_idx = 0
-            for row in f_csv:
-                if self.csv_head is None:
-                    self.find_statistics(row)
-                else:
-                    # self.log.info(row)
-                    self.wechat_data.data.append(row)
-                if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
-                    self.csv_head = next(f_csv)
-                    self.wechat_data.data.append(self.csv_head)
-                row_idx += 1
+        file_names = file_names_text.split('|')
+        for file_name in file_names:
+            print(file_name)
+            with open(file_name) as f:
+                self.csv_head = None
+                f_csv = csv.reader(f)
+                for row in f_csv:
+                    if self.csv_head is None:
+                        self.find_statistics(row)
+                    else:
+                        try:
+                            _fmt_row0 = time.strptime(row[0], "%Y/%m/%d %H:%M")
+                            row[0] = time.strftime("%Y-%m-%d %H:%M:%S", _fmt_row0)
+                            print(row[0])
+                        except:
+                            pass
+                        self.wechat_data.data.append(row)
+                    if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
+                        self.csv_head = next(f_csv)
+        print(self.wechat_data.data)
 
     def find_statistics(self, row_data):
         # 匹配方括号内的字符串
@@ -74,11 +82,8 @@ class DataManager:
     def write_data_to_db(self, data):
         self.log.info('--WRITE to DB---')
         print(self.db_path)
-        self.db.connect_db()
         self.db.creat_table(self.wechat_db.table_name, self.wechat_db.table_attr)
-
         self.db.insert_data(self.wechat_db.table_name, data[1:])
-        pass
 
     def clear_db_data(self):
         self.db.clear_table(self.wechat_db.table_name)

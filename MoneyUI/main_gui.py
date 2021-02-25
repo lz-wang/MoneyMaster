@@ -8,7 +8,7 @@ import os
 import sys
 
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit,
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox,
                              QGridLayout, QApplication, QFileDialog, QTableWidget, QTableWidgetItem)
 
 from WechatPay.WechatPayManager import DataManager
@@ -28,15 +28,12 @@ class MMGui(QWidget):
         self.btn_write_db = QPushButton()
         self.btn_clear_db = QPushButton()
         self.btn_update = QPushButton()
-        self.btn_switch_view = QPushButton()
 
         # LineEdit
         self.ledit_path = QLineEdit()
 
         # TextEdit
-        self.tedit_data = QTextEdit()
         self.tedit_review = QTextEdit()
-        self.tedit_debug_console = QTextEdit()
 
         # TableWidget
         self.table_show_data = QTableWidget()
@@ -76,19 +73,14 @@ class MMGui(QWidget):
 
         self.btn_clear_db.setText('清空数据库')
         self.btn_clear_db.clicked.connect(self.clear_db)
-        self.btn_clear_db.setEnabled(False)
-
-        # 切换textedit和table视图
-        self.btn_switch_view.setText('切换视图')
-        self.btn_switch_view.clicked.connect(self.switch_view)
 
     def init_lineedit(self):
         data_path = os.getcwd() + '/data'
-        wechat_demo = data_path + '/wechat/wechat2020Q4.csv'
+        wechat_demo = data_path + '/wechat/微信支付账单(20201001-20201231).csv'
         self.ledit_path.setText(wechat_demo)
 
     def init_textedit(self):
-        self.tedit_data.setTextColor(QColor('#2c387e'))
+        self.tedit_review.setTextColor(QColor('#2c387e'))
 
     def set_data_review(self, data: dict):
         review = '---------Data Review:---------\n'
@@ -96,7 +88,6 @@ class MMGui(QWidget):
             item = k + ' --> ' + v + '\n'
             review += item
         self.tedit_review.setText(review)
-        pass
 
     def init_tablewidget(self):
         # self.table_show_data.setVisible(False)
@@ -106,13 +97,11 @@ class MMGui(QWidget):
         self.table_show_data.clear()
         self.table_show_data.setColumnCount(len(data[0]))
         self.table_show_data.setRowCount(len(data))
-        self.table_show_data.setHorizontalHeaderLabels(data[0])
-        for i in range(len(data)-1):
+        # self.table_show_data.setHorizontalHeaderLabels(self.wechat.csv_head)
+        for i in range(len(data)):
             for j in range(len(data[0])):
-                item = QTableWidgetItem(str(data[i+1][j]))
+                item = QTableWidgetItem(str(data[i][j]))
                 self.table_show_data.setItem(i, j, item)
-        print(len(data))
-        print(len(data[0]))
 
     def init_layout(self):
         # 设置组件布局
@@ -123,11 +112,8 @@ class MMGui(QWidget):
         self.grid.addWidget(self.btn_read_db, 2, 7)
         self.grid.addWidget(self.btn_write_db, 2, 8)
         self.grid.addWidget(self.btn_clear_db, 3, 8)
-        # self.grid.addWidget(self.btn_switch_view, 3, 7)
-        # self.grid.addWidget(self.tedit_data, 2, 0, 6, 6)
         self.grid.addWidget(self.tedit_review, 2, 0, 5, 6)
         self.grid.addWidget(self.table_show_data, 5, 0, 6, 6)
-        # self.grid.addWidget(self.tedit_debug_console, 3, 0, 5, 6)
         self.setLayout(self.grid)
 
     def init_window(self):
@@ -136,10 +122,11 @@ class MMGui(QWidget):
 
     def import_data_file(self):
         dialog = QFileDialog()
-        f_name = dialog.getOpenFileName(self, 'CHOOSE DATA', 'Python (*.py)')
-        print(f_name[0])
-        if f_name[0] != '':
-            self.ledit_path.setText(f_name[0])
+        f_name = dialog.getOpenFileNames(self, caption='CHOOSE DATA',
+                                         directory='/Users/lzwang/PyProjects/MoneyMaster/data/wechat/')[0]
+        f_name_text = '|'.join(f_name)
+        if f_name:
+            self.ledit_path.setText(f_name_text)
 
     def read_file_data(self):
         file_name = self.ledit_path.text()
@@ -147,14 +134,12 @@ class MMGui(QWidget):
         self.wechat.read_csv_data(file_name)
         self.set_data_review(self.wechat.wechat_data.statistics)
         self.set_tablewidget(self.wechat.wechat_data.data)
-        with open(file_name) as f:
-            data = f.read()
-            self.tedit_data.setText(data)
         if not self.btn_write_db.isEnabled():
             self.btn_write_db.setEnabled(True)
 
     def read_db(self):
-        pass
+        data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
+        self.set_tablewidget(data)
 
     def write_db(self):
         self.log.info('----TO DB-----')
@@ -163,16 +148,10 @@ class MMGui(QWidget):
             self.btn_clear_db.setEnabled(True)
 
     def clear_db(self):
-        self.log.warning('--- CLEAR DB DATA ---')
-        self.wechat.clear_db_data()
-
-    def switch_view(self):
-        if self.tedit_data.isVisible():
-            self.tedit_data.setVisible(False)
-            self.table_show_data.setVisible(True)
-        else:
-            self.tedit_data.setVisible(True)
-            self.table_show_data.setVisible(False)
+        reply = QMessageBox.warning(self, '警告', '清空数据库？', QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.log.warning('--- CLEAR DB DATA ---')
+            self.wechat.clear_db_data()
 
     def console_info(self, text):
         print(text)
