@@ -2,7 +2,7 @@
 #  File info: WechatPayModel.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/24 下午9:32
+#  Last modified: 2021/2/27 上午12:04
 
 class WechatPayData(object):
     def __init__(self):

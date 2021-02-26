@@ -2,7 +2,7 @@
 #  File info: WechatPayManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/21 上午10:48
+#  Last modified: 2021/2/27 上午12:04
 import csv
 import os
 import re

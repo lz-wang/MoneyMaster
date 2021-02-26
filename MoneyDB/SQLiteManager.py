@@ -2,7 +2,7 @@
 #  File info: SQLiteManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/24 下午9:27
+#  Last modified: 2021/2/27 上午12:04
 import os
 import sqlite3
 
@@ -91,7 +91,7 @@ class MySqlite(object):
         pass
 
     def query_all_data(self, table_name: str):
-        sql = 'SELECT * FROM ' + table_name
+        sql = 'SELECT * FROM ' + table_name + ' ORDER BY trans_time ASC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 

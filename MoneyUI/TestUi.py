@@ -1,14 +1,14 @@
 #  Copyright (c) lzwang 2020-2021, All Rights Reserved.
-#  File info: main_gui.py in MoneyMaster (version 0.1)
+#  File info: TestUi.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/24 下午9:33
+#  Last modified: 2021/2/27 上午12:04
 
 import os
 import sys
 
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox,
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox, QMainWindow,
                              QGridLayout, QApplication, QFileDialog, QTableWidget, QTableWidgetItem)
 
 from WechatPay.WechatPayManager import DataManager
@@ -16,8 +16,8 @@ from WechatPay.WechatPayManager import DataManager
 
 class MMGui(QWidget):
     def __init__(self):
-        super().__init__()
         # data process
+        super().__init__()
         self.wechat = DataManager()
         self.log = self.wechat.log
 
