@@ -5,7 +5,7 @@
 #  Last modified: 2021/2/27 上午12:04
 import sys
 from MoneyUI.TestUi import run_gui
-from MoneyUI.MoenyMainWindow import MoenyMainWindow, QApplication
+from MoneyUI.MainWindow import MoenyMainWindow, QApplication
 
 
 if __name__ == '__main__':

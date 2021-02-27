@@ -5,6 +5,7 @@
 #  Last modified: 2021/2/27 上午12:04
 import os
 import sqlite3
+import datetime
 
 
 class MySqlite(object):
@@ -92,6 +93,29 @@ class MySqlite(object):
 
     def query_all_data(self, table_name: str):
         sql = 'SELECT * FROM ' + table_name + ' ORDER BY trans_time ASC'
+        self.execute_sql(sql)
+        return self.cur.fetchall()
+
+    def query_by_trans_time(self, table_name: str, dt_start=None, dt_end=None):
+        """
+        dt --> datetime --> fmt: %Y-%m-%d %H:%M:%S
+        """
+        if dt_start is None:
+            start = '2000-01-01 00:00:00'
+        else:
+            start = dt_start.strftime('%Y-%m-%d %H:%M:%S')
+        if dt_end is None:
+            end = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            end = dt_end.strftime('%Y-%m-%d %H:%M:%S')
+        sql = 'SELECT * FROM ' + table_name + ' WHERE trans_time BETWEEN \'' + \
+              start + '\' and \'' + end + '\' ORDER BY trans_time ASC'
+        self.execute_sql(sql)
+        return self.cur.fetchall()
+
+    def query_min_max_trans_time(self, table_name: str):
+        sql = 'SELECT MIN(trans_time), MAX(trans_time) FROM ' +\
+              table_name + ' ORDER BY trans_time ASC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
