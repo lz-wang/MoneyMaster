@@ -20,6 +20,10 @@ class MoneyTableWidget(QWidget):
         self.page_col = self.total_col
         self.page = int(self.total_row/self.page_row) + 1
         self.page_data = []
+        self.table = QTableWidget()
+        self.__layout = QVBoxLayout()
+        self.skip_page = QLineEdit()
+
         self.__init_ui()
 
     def __init_ui(self):
@@ -33,19 +37,19 @@ class MoneyTableWidget(QWidget):
                 max-width: 30px
             }
         """
-        self.table = QTableWidget()
+        # self.table = QTableWidget()
         self.table.setRowCount(self.page_row)
         self.table.setColumnCount(self.page_col)
         self.table.setHorizontalHeaderLabels(self.head)
         self.table.setShowGrid(True)
         # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 自适应宽度
         self.set_page_data(1)
-        self.__layout = QVBoxLayout()
+        # self.__layout = QVBoxLayout()
         self.__layout.addWidget(self.table)
         self.setLayout(self.__layout)
         self.setStyleSheet(style_sheet)
 
-        self.skip_page = QLineEdit()
+        # self.skip_page = QLineEdit()
         self.cur_page = QLabel("1")
         self.total_page = QLabel("共" + str(self.page) + "页")
 
@@ -112,6 +116,18 @@ class MoneyTableWidget(QWidget):
             for c in range(self.page_col):
                 item = QTableWidgetItem(str(page_data[r][c]))
                 self.table.setItem(r, c, item)
+
+    def set_table_data(self, data):
+        # TODO: fix bug
+        self.total_data = data
+        self.table.clear()
+        self.table.setHorizontalHeaderLabels(self.head)
+        self.total_row = len(data)
+        self.page = int(self.total_row/self.page_row) + 1
+        self.cur_page.setText('1')
+        self.total_page.setText("共" + str(self.page) + "页")
+        self.__init_ui()
+        self.set_page_data(1)
 
     def show_total_page(self):
         return int(self.total_page.text()[1:-1])

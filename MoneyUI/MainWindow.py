@@ -24,10 +24,11 @@ class MoenyMainWindow(QMainWindow):
         # _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
         self.__init_money_table_widget()
         self.__init_time_filter_group()
+        self.__init_right_side()
 
         self.hbox = QHBoxLayout()
         self.hbox.addWidget(self.table_widget)
-        self.hbox.addWidget(self.time_widget)
+        self.hbox.addWidget(self.right_side)
         self.main_widget = QWidget()
         self.main_widget.setLayout(self.hbox)
         # self.setLayout(self.hbox)
@@ -44,6 +45,15 @@ class MoenyMainWindow(QMainWindow):
         self.table_widget.set_page_controller()
         self.table_widget.control_signal.connect(self.page_controller)
 
+    def __init_right_side(self):
+        self.right_side = QWidget()
+        verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.time_widget)
+        vbox.addItem(verticalSpacer)
+        self.right_side = QWidget()
+        self.right_side.setLayout(vbox)
+
     def __init_time_filter_group(self):
         self.__init_time_filter_widget()
         self.time_widget = QWidget()
@@ -52,8 +62,11 @@ class MoenyMainWindow(QMainWindow):
         start_label = QLabel('开始时间')
         end_label = QLabel('结束时间')
         self.back_start = QPushButton('回到最早')
-        self.back_start.clicked.connect()
+        self.back_start.clicked.connect(self._back_start)
         self.to_end = QPushButton('去向最近')
+        self.to_end.clicked.connect(self._to_end)
+        self.query_db = QPushButton('查询数据库')
+        self.query_db.clicked.connect(self._query_db)
 
         grid = QGridLayout()
         grid.addWidget(time_widget_title, 1, 1, 1, 2)
@@ -63,13 +76,40 @@ class MoenyMainWindow(QMainWindow):
         grid.addWidget(self.right_time_widget, 3, 2)
         grid.addWidget(self.back_start, 4, 1)
         grid.addWidget(self.to_end, 4, 2)
+        grid.addWidget(self.query_db, 5, 2)
         self.time_widget.setLayout(grid)
 
-    def back_start(self):
-        pass
+    def _back_start(self):
+        start_year = self.left_time_widget.start_year
+        start_month = self.left_time_widget.start_month
+        start_day = self.left_time_widget.start_day
+        self.left_time_widget.year_combox.setCurrentText(str(start_year))
+        self.left_time_widget.month_combox.setCurrentText(str(start_month))
+        self.left_time_widget.day_combox.setCurrentText(str(start_day))
 
-    def to_end(self):
-        pass
+    def _to_end(self):
+        end_year = self.right_time_widget.end_year
+        end_month = self.right_time_widget.end_month
+        end_day = self.right_time_widget.end_day
+        self.right_time_widget.year_combox.setCurrentText(str(end_year))
+        self.right_time_widget.month_combox.setCurrentText(str(end_month))
+        self.right_time_widget.day_combox.setCurrentText(str(end_day))
+
+    def _query_db(self):
+        start_year = str(self.left_time_widget.year_combox.currentText())
+        start_month = str(self.left_time_widget.month_combox.currentText())
+        start_day = str(self.left_time_widget.month_combox.currentText())
+        end_year = str(self.right_time_widget.year_combox.currentText())
+        end_month = str(self.right_time_widget.month_combox.currentText())
+        end_day = str(self.right_time_widget.month_combox.currentText())
+        start_str = start_year + '-' + start_month + '-' + start_day + ' 00:00:00'
+        end_str = end_year + '-' + end_month + '-' + end_day + ' 23:59:59'
+        start = datetime.strptime(start_str, '%Y-%m-%d %H:%M:%S')
+        end = datetime.strptime(end_str, '%Y-%m-%d %H:%M:%S')
+        data = self.wechat.db.query_by_trans_time(self.wechat.wechat_db.table_name,
+                                                  start, end)
+
+        self.update_table(data=data)
 
     def __init_time_filter_widget(self):
         data = self.wechat.db.query_min_max_trans_time(self.wechat.wechat_db.table_name)[0]
@@ -103,8 +143,11 @@ class MoenyMainWindow(QMainWindow):
         cur_page = int(self.table_widget.cur_page.text())
         self.update_table(page=cur_page)
 
-    def update_table(self, page):
-        self.table_widget.set_page_data(page)
+    def update_table(self, page=None, data=None):
+        if page is not None:
+            self.table_widget.set_page_data(page)
+        if data is not None:
+            self.table_widget.set_table_data(data)
 
     def read_db(self):
         self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)

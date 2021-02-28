@@ -99,14 +99,10 @@ class TimeFilterWidget(QWidget):
         else:
             months = self.months
             month_value = month
-        print(months)
-        print(month_value)
         self.month_combox.clear()
         for _month in months:
             self.month_combox.addItem(str(_month))
         self.month_combox.setCurrentText(str(month_value))
-        print(str(self.day_combox.currentText()))
-        # self.change_day()
 
     def change_day(self):
         if self.month_combox.currentText() == '':
