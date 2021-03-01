@@ -92,7 +92,7 @@ class MySqlite(object):
         pass
 
     def query_all_data(self, table_name: str):
-        sql = 'SELECT * FROM ' + table_name + ' ORDER BY trans_time ASC'
+        sql = 'SELECT * FROM ' + table_name + ' ORDER BY trans_time DESC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
@@ -121,12 +121,12 @@ class MySqlite(object):
 
     def execute_sql(self, sql: str):
         try:
-            print('***** execute SQL: ' + sql)
+            print('***** EXECUTE MYSQL: ' + sql)
             self.cur.execute(sql)
             self.con.commit()
-            print('***** result: SUCCESS *****')
+            print('***** RESULT: SUCCESS *****')
         except Exception as e:
-            print('***** result: FAILED, REASON: %s' % e)
+            print('***** RESULT: FAILED, REASON: %s' % e)
 
 
 if __name__ == '__main__':

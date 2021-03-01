@@ -41,8 +41,8 @@ class MoenyMainWindow(QMainWindow):
         #                                               dt_start=ds, dt_end=de)
         _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
         _table_head = list(self.wechat.wechat_db.table_attr.keys())
-        self.table_widget = MoneyTableWidget(page_row=50, data=_db_data, head=_table_head)
-        self.table_widget.set_page_controller()
+        self.table_widget = MoneyTableWidget(page_row=100, data=_db_data, head=_table_head)
+        # self.table_widget.set_page_controller()
         self.table_widget.control_signal.connect(self.page_controller)
 
     def __init_right_side(self):
@@ -57,14 +57,20 @@ class MoenyMainWindow(QMainWindow):
     def __init_time_filter_group(self):
         self.__init_time_filter_widget()
         self.time_widget = QWidget()
-        time_widget_title = QLabel('时间过滤器')
+
+        time_widget_title = QLabel('===时间过滤器===')
         time_widget_title.setAlignment(Qt.AlignHCenter)
-        start_label = QLabel('开始时间')
-        end_label = QLabel('结束时间')
+        start_label = QLabel('--开始时间--')
+        start_label.setAlignment(Qt.AlignHCenter)
+        end_label = QLabel('--结束时间--')
+        end_label.setAlignment(Qt.AlignHCenter)
+
         self.back_start = QPushButton('回到最早')
         self.back_start.clicked.connect(self._back_start)
         self.to_end = QPushButton('去向最近')
         self.to_end.clicked.connect(self._to_end)
+        self.change_order = QPushButton('切换顺序')
+        self.change_order.clicked.connect(self._change_order)
         self.query_db = QPushButton('查询数据库')
         self.query_db.clicked.connect(self._query_db)
 
@@ -76,6 +82,7 @@ class MoenyMainWindow(QMainWindow):
         grid.addWidget(self.right_time_widget, 3, 2)
         grid.addWidget(self.back_start, 4, 1)
         grid.addWidget(self.to_end, 4, 2)
+        grid.addWidget(self.change_order, 5, 1)
         grid.addWidget(self.query_db, 5, 2)
         self.time_widget.setLayout(grid)
 
@@ -95,13 +102,19 @@ class MoenyMainWindow(QMainWindow):
         self.right_time_widget.month_combox.setCurrentText(str(end_month))
         self.right_time_widget.day_combox.setCurrentText(str(end_day))
 
+    def _change_order(self):
+        self.table_widget.total_data.reverse()
+        self.table_widget.set_table_data()
+
     def _query_db(self):
         start_year = str(self.left_time_widget.year_combox.currentText())
         start_month = str(self.left_time_widget.month_combox.currentText())
-        start_day = str(self.left_time_widget.month_combox.currentText())
+        start_day = str(self.left_time_widget.day_combox.currentText())
         end_year = str(self.right_time_widget.year_combox.currentText())
         end_month = str(self.right_time_widget.month_combox.currentText())
-        end_day = str(self.right_time_widget.month_combox.currentText())
+        end_day = str(self.right_time_widget.day_combox.currentText())
+        self.log.info('start: %s-%s-%s' % (start_year, start_month, start_day))
+        self.log.info('end: %s-%s-%s' % (end_year, end_month, end_day))
         start_str = start_year + '-' + start_month + '-' + start_day + ' 00:00:00'
         end_str = end_year + '-' + end_month + '-' + end_day + ' 23:59:59'
         start = datetime.strptime(start_str, '%Y-%m-%d %H:%M:%S')

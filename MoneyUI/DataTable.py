@@ -5,6 +5,7 @@
 #  Last modified: 2021/2/27 下午10:19
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSignal
+from MoneyUI.MoneyStyle import MONEY_TABLE_STYLE
 
 
 class MoneyTableWidget(QWidget):
@@ -21,68 +22,53 @@ class MoneyTableWidget(QWidget):
         self.page = int(self.total_row/self.page_row) + 1
         self.page_data = []
         self.table = QTableWidget()
-        self.__layout = QVBoxLayout()
-        self.skip_page = QLineEdit()
+        self.page_control_hbox = QHBoxLayout()
+        self.global_layout = QVBoxLayout()
+        self.global_layout.addWidget(self.table)
+        self.global_layout.addLayout(self.page_control_hbox)
+        self.setLayout(self.global_layout)
+        self.setStyleSheet(MONEY_TABLE_STYLE)
+        self.__init_data_table()
+        self.__init_page_controller()
 
-        self.__init_ui()
-
-    def __init_ui(self):
-        style_sheet = """
-            QPushButton{
-                max-width: 18ex;
-                max-height: 6ex;
-                font-size: 11px;
-            }
-            QLineEdit{
-                max-width: 30px
-            }
-        """
-        # self.table = QTableWidget()
+    def __init_data_table(self):
         self.table.setRowCount(self.page_row)
         self.table.setColumnCount(self.page_col)
         self.table.setHorizontalHeaderLabels(self.head)
         self.table.setShowGrid(True)
-        # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 自适应宽度
+        # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.set_page_data(1)
-        # self.__layout = QVBoxLayout()
-        self.__layout.addWidget(self.table)
-        self.setLayout(self.__layout)
-        self.setStyleSheet(style_sheet)
 
-        # self.skip_page = QLineEdit()
+    def __init_page_controller(self):
+        self.first_page = QPushButton("首页")
+        self.pre_page = QPushButton("<上一页")
         self.cur_page = QLabel("1")
+        self.next_page = QPushButton("下一页>")
+        self.final_page = QPushButton("尾页")
         self.total_page = QLabel("共" + str(self.page) + "页")
+        self.skip_lable_0 = QLabel("跳到")
+        self.skip_page = QLineEdit()
+        self.skip_label_1 = QLabel("页")
+        self.confirm_skip = QPushButton("确定")
+        
+        self.first_page.clicked.connect(self._first_page)
+        self.pre_page.clicked.connect(self._pre_page)
+        self.next_page.clicked.connect(self._next_page)
+        self.final_page.clicked.connect(self._final_page)
+        self.confirm_skip.clicked.connect(self._skip_page)
 
-    def set_page_controller(self):
-        """自定义页码控制器"""
-        control_layout = QHBoxLayout()
-        first_page = QPushButton("首页")
-        pre_page = QPushButton("<上一页")
-        next_page = QPushButton("下一页>")
-        final_page = QPushButton("尾页")
-        skip_lable_0 = QLabel("跳到")
-        skip_label_1 = QLabel("页")
-        confirm_skip = QPushButton("确定")
-
-        first_page.clicked.connect(self._first_page)
-        pre_page.clicked.connect(self._pre_page)
-        next_page.clicked.connect(self._next_page)
-        final_page.clicked.connect(self._final_page)
-        confirm_skip.clicked.connect(self._skip_page)
-
-        control_layout.addStretch(1)
-        control_layout.addWidget(first_page)
-        control_layout.addWidget(pre_page)
-        control_layout.addWidget(self.cur_page)
-        control_layout.addWidget(next_page)
-        control_layout.addWidget(final_page)
-        control_layout.addWidget(self.total_page)
-        control_layout.addWidget(skip_lable_0)
-        control_layout.addWidget(self.skip_page)
-        control_layout.addWidget(skip_label_1)
-        control_layout.addWidget(confirm_skip)
-        control_layout.addStretch(1)
-        self.__layout.addLayout(control_layout)
+        self.page_control_hbox.addStretch(1)
+        self.page_control_hbox.addWidget(self.first_page)
+        self.page_control_hbox.addWidget(self.pre_page)
+        self.page_control_hbox.addWidget(self.cur_page)
+        self.page_control_hbox.addWidget(self.next_page)
+        self.page_control_hbox.addWidget(self.final_page)
+        self.page_control_hbox.addWidget(self.total_page)
+        self.page_control_hbox.addWidget(self.skip_lable_0)
+        self.page_control_hbox.addWidget(self.skip_page)
+        self.page_control_hbox.addWidget(self.skip_label_1)
+        self.page_control_hbox.addWidget(self.confirm_skip)
+        self.page_control_hbox.addStretch(1)
 
     def _first_page(self):
         self.control_signal.emit(["first_page", self.cur_page.text()])
@@ -117,16 +103,16 @@ class MoneyTableWidget(QWidget):
                 item = QTableWidgetItem(str(page_data[r][c]))
                 self.table.setItem(r, c, item)
 
-    def set_table_data(self, data):
-        # TODO: fix bug
-        self.total_data = data
+    def set_table_data(self, data=None):
+        if data is not None:
+            self.total_data = data
         self.table.clear()
         self.table.setHorizontalHeaderLabels(self.head)
-        self.total_row = len(data)
+        self.total_row = len(self.total_data)
         self.page = int(self.total_row/self.page_row) + 1
         self.cur_page.setText('1')
         self.total_page.setText("共" + str(self.page) + "页")
-        self.__init_ui()
+        self.__init_data_table()
         self.set_page_data(1)
 
     def show_total_page(self):

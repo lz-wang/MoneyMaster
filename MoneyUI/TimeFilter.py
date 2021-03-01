@@ -26,8 +26,6 @@ class TimeFilterWidget(QWidget):
         self.__init_ui()
 
     def __init_datetime(self):
-        print(self.start.strftime('%Y-%m-%d %H:%M:%S'))
-        print(self.end.strftime('%Y-%m-%d %H:%M:%S'))
         self.start_year = self.start.year
         self.start_month = self.start.month
         self.start_day = self.start.day
