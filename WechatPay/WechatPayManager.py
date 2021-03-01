@@ -16,7 +16,7 @@ from utils.mylog import Logger
 
 class DataManager:
     def __init__(self):
-        self.log = Logger(to_file=False).logger
+        self.log = Logger(to_file=True).logger
         self.csv_head = None
         self.wechat_data = WechatPayData()
         self.wechat_db = WechatPayDB()
@@ -98,7 +98,7 @@ class DataManager:
 if __name__ == '__main__':
     print('')
     data_path = os.path.join(os.getcwd(), '../data')
-    wechat_data = data_path + '/wechat/wechat2020Q4.csv'
+    wechat_data = data_path + '/wechat_test.csv'
     wm = DataManager()
     wm.log.info(wechat_data)
     wm.read_csv_data(wechat_data)
