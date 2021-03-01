@@ -2,7 +2,7 @@
 #  File info: MoneyStyle.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/1 下午11:58
+#  Last modified: 2021/3/2 上午12:00
 """
 此文件用于存放UI的样式设置
 """
