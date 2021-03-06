@@ -4,8 +4,9 @@
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/2/28 上午2:49
 import sys
+from PyQt5.QtWidgets import QApplication
 from MoneyUI.TestUi import run_gui
-from MoneyUI.MainWindow import MoenyMainWindow, QApplication
+from MoneyUI.MainWindow import MoenyMainWindow
 
 
 if __name__ == '__main__':

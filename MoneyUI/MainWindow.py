@@ -4,9 +4,13 @@
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/2 上午12:20
 from datetime import datetime
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QWidget, QTabWidget, QMainWindow,
+                             QPushButton, QLabel, QSpacerItem, QSizePolicy,
+                             QMessageBox,
+                             QHBoxLayout, QVBoxLayout, QGridLayout, QFormLayout, QGroupBox)
 from PyQt5.QtCore import Qt
 from MoneyUI.DataTable import MoneyTableWidget
+from MoneyUI.DataChart import MoneyChartWidget
 from MoneyUI.TimeFilter import TimeFilterWidget
 from WechatPay.WechatPayManager import DataManager
 
@@ -20,18 +24,22 @@ class MoenyMainWindow(QMainWindow):
 
     def __init_ui(self):
         self.resize(1200, 800)
-        self.setWindowTitle("数据库分页视图")
+        self.setWindowTitle("Money Master")
         # _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
         self.__init_money_table_widget()
+        self.__init_money_chart_widget()
         self.__init_time_filter_group()
         self.__init_right_side()
+        self.left_widget = QTabWidget()
+        self.left_widget.addTab(self.table_widget, self.table_widget.windowTitle())
+        self.left_widget.addTab(self.chart_widget, self.chart_widget.windowTitle())
+        print(self.table_widget.windowTitle())
 
         self.hbox = QHBoxLayout()
-        self.hbox.addWidget(self.table_widget)
+        self.hbox.addWidget(self.left_widget)
         self.hbox.addWidget(self.right_side)
         self.main_widget = QWidget()
         self.main_widget.setLayout(self.hbox)
-        # self.setLayout(self.hbox)
         self.setCentralWidget(self.main_widget)
 
     def __init_money_table_widget(self):
@@ -42,8 +50,13 @@ class MoenyMainWindow(QMainWindow):
         _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
         _table_head = list(self.wechat.wechat_db.table_attr.keys())
         self.table_widget = MoneyTableWidget(page_row=100, data=_db_data, head=_table_head)
+        self.table_widget.setWindowTitle("表格视图")
         # self.table_widget.set_page_controller()
         self.table_widget.control_signal.connect(self.page_controller)
+
+    def __init_money_chart_widget(self):
+        self.chart_widget = MoneyChartWidget()
+        self.chart_widget.setWindowTitle('折线图')
 
     def __init_right_side(self):
         self.right_side = QWidget()
@@ -125,7 +138,7 @@ class MoenyMainWindow(QMainWindow):
         self.update_table(data=data)
 
     def __init_time_filter_widget(self):
-        data = self.wechat.db.query_min_max_trans_time(self.wechat.wechat_db.table_name)[0]
+        data = self.wechat.db.query_all_trans_time_data(self.wechat.wechat_db.table_name)[0]
         self.start = datetime.strptime(data[0], '%Y-%m-%d %H:%M:%S')
         self.end = datetime.strptime(data[1], '%Y-%m-%d %H:%M:%S')
         self.left_time_widget = TimeFilterWidget(self.start, self.end, False)

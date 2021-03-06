@@ -48,7 +48,6 @@ class TimeFilterWidget(QWidget):
         else:
             self.year_combox.setCurrentIndex(self.end_year-self.start_year)
         self.year_combox.currentTextChanged.connect(self.change_month)
-        # self.year_combox.currentTextChanged.connect(self.change_day)
 
         # init month
         self.month_label = QLabel('Month: ')

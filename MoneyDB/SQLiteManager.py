@@ -6,6 +6,7 @@
 import os
 import sqlite3
 import datetime
+from utils.mylog import Logger
 
 
 class MySqlite(object):
@@ -17,6 +18,7 @@ class MySqlite(object):
         self.db_file_path = db_name
         self.con = None
         self.cur = None
+        self.log = Logger().logger
 
     def connect_db(self):
         self.con = sqlite3.connect(database=self.db_file_path)
@@ -69,12 +71,14 @@ class MySqlite(object):
             _attr += (k + ',')
             _values += ('\'' + str(v) + '\',')
 
-        sql = 'INSERT INTO ' + table_name + \
-              ' (' + _attr[0:-1] + \
-              ') VALUES (' + _values[0: -1] + ')'
+        sql = 'INSERT INTO ' + table_name + ' (' + _attr[0:-1] + ') VALUES (' + _values[0: -1] + ')'
         self.execute_sql(sql)
 
     def insert_multi_data(self, table_name: str, data):
+        """
+        插入多条数据
+        data --> 可迭代的list或tuple
+        """
         for r in data:
             _values = ''
             for v in r:
@@ -92,12 +96,14 @@ class MySqlite(object):
         pass
 
     def query_all_data(self, table_name: str):
+        """索引指定表的全部数据"""
         sql = 'SELECT * FROM ' + table_name + ' ORDER BY trans_time DESC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
     def query_by_trans_time(self, table_name: str, dt_start=None, dt_end=None):
         """
+        根据时间段索引数据
         dt --> datetime --> fmt: %Y-%m-%d %H:%M:%S
         """
         if dt_start is None:
@@ -113,20 +119,20 @@ class MySqlite(object):
         self.execute_sql(sql)
         return self.cur.fetchall()
 
-    def query_min_max_trans_time(self, table_name: str):
-        sql = 'SELECT MIN(trans_time), MAX(trans_time) FROM ' +\
-              table_name + ' ORDER BY trans_time ASC'
+    def query_all_trans_time_data(self, table_name: str):
+        """索引全部交易时间的数据"""
+        sql = 'SELECT MIN(trans_time), MAX(trans_time) FROM ' + table_name + ' ORDER BY trans_time ASC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
     def execute_sql(self, sql: str):
         try:
-            print('***** EXECUTE MYSQL: ' + sql)
+            self.log.info('***** EXECUTE MYSQL: ' + sql)
             self.cur.execute(sql)
             self.con.commit()
-            print('***** RESULT: SUCCESS *****')
+            self.log.info('***** MySQL RESULT: SUCCESS *****')
         except Exception as e:
-            print('***** RESULT: FAILED, REASON: %s' % e)
+            self.log.warning('***** MySQL RESULT: FAILED, REASON: %s' % e)
 
 
 if __name__ == '__main__':
