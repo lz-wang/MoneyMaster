@@ -2,7 +2,7 @@
 #  File info: main.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/2/28 上午2:49
+#  Last modified: 2021/3/7 上午12:14
 import sys
 from PyQt5.QtWidgets import QApplication
 from MoneyUI.TestUi import run_gui

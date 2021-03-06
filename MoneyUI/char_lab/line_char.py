@@ -1,4 +1,10 @@
 
+#  Copyright (c) lzwang 2020-2021, All Rights Reserved.
+#  File info: line_char.py in MoneyMaster (version 0.1)
+#  Author: Liangzhuang Wang
+#  Email: zhuangwang82@gmail.com
+#  Last modified: 2021/3/4 上午12:21
+
 import sys, random
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtChart import QChartView, QChart, QLineSeries, QValueAxis, QBarCategoryAxis

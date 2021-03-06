@@ -2,7 +2,7 @@
 #  File info: DataChart.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/7 上午12:22
+#  Last modified: 2021/3/7 上午1:28
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QSplineSeries, QScatterSeries, QValueAxis
