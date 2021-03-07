@@ -84,6 +84,7 @@ class MoneyChartWidget(QChartView):
             fake_data = [random.randint(0, 50) for _ in range(31)]
             self.data['Month-' + str(i)] = fake_data
 
+
 def test():
     mcd = MoneyChartData()
     for i in range(3):

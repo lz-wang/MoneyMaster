@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QMainWindow,
                              QHBoxLayout, QVBoxLayout, QGridLayout, QFormLayout, QGroupBox)
 from PyQt5.QtCore import Qt
 from MoneyUI.DataTable import MoneyTableWidget
-from MoneyUI.DataChart import MoneyChartWidget
+from MoneyUI.DataChart import MoneyChartWidget, MoneyChartData
 from MoneyUI.TimeFilter import TimeFilterWidget
 from WechatPay.WechatPayManager import DataManager
 
@@ -27,12 +27,12 @@ class MoenyMainWindow(QMainWindow):
         self.setWindowTitle("Money Master")
         # _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
         self.__init_money_table_widget()
-        self.__init_money_chart_widget()
+        self.__init_line_chart_widget()
         self.__init_time_filter_group()
         self.__init_right_side()
         self.left_widget = QTabWidget()
         self.left_widget.addTab(self.table_widget, self.table_widget.windowTitle())
-        self.left_widget.addTab(self.chart_widget, self.chart_widget.windowTitle())
+        self.left_widget.addTab(self.line_chart_widget, self.line_chart_widget.windowTitle())
         print(self.table_widget.windowTitle())
 
         self.hbox = QHBoxLayout()
@@ -54,9 +54,10 @@ class MoenyMainWindow(QMainWindow):
         # self.table_widget.set_page_controller()
         self.table_widget.control_signal.connect(self.page_controller)
 
-    def __init_money_chart_widget(self):
-        self.chart_widget = MoneyChartWidget()
-        self.chart_widget.setWindowTitle('折线图')
+    def __init_line_chart_widget(self):
+        self.line_chart_data = MoneyChartData()
+        self.line_chart_widget = MoneyChartWidget()
+        self.line_chart_widget.setWindowTitle('折线图')
 
     def __init_right_side(self):
         self.right_side = QWidget()
@@ -86,6 +87,8 @@ class MoenyMainWindow(QMainWindow):
         self.change_order.clicked.connect(self._change_order)
         self.query_db = QPushButton('查询数据库')
         self.query_db.clicked.connect(self._query_db)
+        self.test_btn_1 = QPushButton('TEST 1')
+        self.test_btn_1.clicked.connect(self._test_1)
 
         grid = QGridLayout()
         grid.addWidget(time_widget_title, 1, 1, 1, 2)
@@ -97,7 +100,11 @@ class MoenyMainWindow(QMainWindow):
         grid.addWidget(self.to_end, 4, 2)
         grid.addWidget(self.change_order, 5, 1)
         grid.addWidget(self.query_db, 5, 2)
+        grid.addWidget(self.test_btn_1, 6, 1)
         self.time_widget.setLayout(grid)
+
+    def _test_1(self):
+        self.wechat.db.query_by_month_trans_time_data(self.wechat.wechat_db.table_name, 2020, 12)
 
     def _back_start(self):
         start_year = self.left_time_widget.start_year
