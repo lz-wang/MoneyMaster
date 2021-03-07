@@ -43,6 +43,7 @@ class DataManager:
                             print(row[0])
                         except:
                             pass
+                        row[5] = float(row[5][1:])
                         self.wechat_data.data.append(row)
                     if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
                         self.csv_head = next(f_csv)
