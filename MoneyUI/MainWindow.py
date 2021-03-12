@@ -13,6 +13,7 @@ from MoneyUI.DataTable import MoneyTableWidget
 from MoneyUI.DataChart import MoneyChartWidget, MoneyChartData
 from MoneyUI.TimeFilter import TimeFilterWidget
 from WechatPay.WechatPayManager import DataManager
+from model.MoneyData import MonthData
 
 
 class MoenyMainWindow(QMainWindow):
@@ -55,7 +56,7 @@ class MoenyMainWindow(QMainWindow):
         self.table_widget.control_signal.connect(self.page_controller)
 
     def __init_line_chart_widget(self):
-        self.line_chart_data = MoneyChartData()
+        # self.line_chart_data = MoneyChartData()
         self.line_chart_widget = MoneyChartWidget()
         self.line_chart_widget.setWindowTitle('折线图')
 
@@ -104,7 +105,13 @@ class MoenyMainWindow(QMainWindow):
         self.time_widget.setLayout(grid)
 
     def _test_1(self):
-        self.wechat.db.query_by_month_trans_time_data(self.wechat.wechat_db.table_name, 2020, 12)
+        y, m = 2020, 11
+        sql_result = self.wechat.db.query_by_month_trans_time_data(self.wechat.wechat_db.table_name, y, m)
+        m_data = MonthData(str(y) + '年' + str(m) + '月 支出数据')
+        print(sql_result)
+        m_data.from_sqlite(sql_result)
+        # self.line_chart_widget.set_line_chart_data(data=m_data)
+        self.line_chart_widget.set_bar_chart_data(data=m_data)
 
     def _back_start(self):
         start_year = self.left_time_widget.start_year

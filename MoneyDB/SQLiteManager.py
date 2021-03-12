@@ -121,21 +121,15 @@ class MySqlite(object):
 
     def query_by_month_trans_time_data(self, table_name: str, year: int = None, month: int = 1):
         """
-        TODO: 索引指定月份的数据，统计每天的总额
+        索引指定月份的数据，统计每天支出或收入的总额
         """
         if year is None:
             year = 2020
-        # sql = 'SELECT * FROM ' + table_name + ' WHERE trans_time=\'2020-12-31\''
-        sql = 'SELECT type, money FROM ' + table_name + ' WHERE strftime(\'%Y%m\', trans_time)=\'' \
-              + str(year) + str(month) + '\''  # ' GROUP BY strftime(\'%Y%m%d\', trans_time)'
+        sql = 'SELECT strftime(\'%Y-%m-%d\', trans_time), type, SUM(money) FROM ' + table_name + \
+              ' WHERE strftime(\'%Y%m\', trans_time)=\'' + str(year) + str(month) + \
+              '\' GROUP BY strftime(\'%Y%m%d\', trans_time), type'
         self.execute_sql(sql)
-        raw_data = self.cur.fetchall()
-        print(raw_data)
-        # num_data =
-        # for data in raw_data:
-        #     if
-        # num_data = [float(money[0][1:]) for money in raw_data]
-        # print(num_data)
+        return self.cur.fetchall()
 
     def query_all_trans_time_data(self, table_name: str):
         """索引全部交易时间的数据"""

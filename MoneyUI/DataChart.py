@@ -3,16 +3,20 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/7 上午1:28
-from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtChart import QChart, QChartView, QLineSeries, QSplineSeries, QScatterSeries, QValueAxis
+import random  # TODO: test only, to be removed
+import sys
 
-import sys, random  # TODO: test only, to be removed
+from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarSet, QBarSeries, QBarCategoryAxis
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication
+
+from model.MoneyData import MonthData
 
 
 class MoneyChartData(object):
     def __init__(self):
-        self.data: dict = {}
+        self.source: str = ''
+        self.data: dict = {}  # {'in': 20, '}
 
     def add_data(self, label: str = None, data: list = None):
         if label is None:
@@ -21,51 +25,66 @@ class MoneyChartData(object):
 
 
 class MoneyChartWidget(QChartView):
-    def __init__(self, chart_data: MoneyChartData = None):
+    def __init__(self, chart_title: str = 'Default'):
         super().__init__()
-        self.data: dict = {}
-        if chart_data:
-            self.data = chart_data.data
-        else:
-            self.mock_data()
-        # self.resize(800, 600)
-        # self.chart_view = QChartView(self)
-        # self.chart_view.resize(1200, 800)
-        self.__init_line_chart(data=self.data)
+        self.chart_title = chart_title
+        self.__init_line_chart()
+        self.__init_bar_chart()
 
-    def __init_line_chart(self, data: dict):
+    def __init_line_chart(self):
         self.line_chart = QChart()
-        for label, values in data.items():
-            self.add_line_chart_data(label, values)
-        # axis_x = QValueAxis()
-        # axis_x.setRange(0, 31)
-        # axis_x.setTickCount(31)
-        # axis_x.applyNiceNumbers()
-        # axis_x.setTitleText('DAY')
-        #
-        # axis_y = QValueAxis()
-        # axis_y.setRange(-10, 60)
-        # axis_y.setTitleText('RMB')
-        # self.line_chart.setAxisX(axis_x)
-        # self.line_chart.setAxisY(axis_y)
-
         self.line_chart.createDefaultAxes()
-        self.line_chart.setTitle('Month Data')
+        self.line_chart.setTitle(self.chart_title)
         self.line_chart.legend().setVisible(True)
         self.line_chart.legend().setAlignment(Qt.AlignBottom)
 
-        self.setChart(self.line_chart)
-        pass
+    def set_line_chart_data(self, data=None):
+        if isinstance(data, MonthData):
+            series = QLineSeries()
+            series.setName(data.name)
+            for single_data in data.data:
+                date_day = int(single_data['date'].split('-')[-1])
+                money_type = single_data['type']
+                money = single_data['money']
+                if money_type == '支出':
+                    series.append(date_day, money)
 
-    def add_line_chart_data(self, name: str, data: list):
-        series = QLineSeries()
-        series.setName(name)
-        for idx, value in enumerate(data):
-            series.append(idx, value)
-        self.line_chart.addSeries(series)
+            self.line_chart.addSeries(series)
+        self.line_chart.createDefaultAxes()
+        self.setChart(self.line_chart)
 
     def __init_bar_chart(self):
-        pass
+        self.bar_chart = QChart()
+        self.bar_chart.setTitle(self.chart_title)
+        self.line_chart.legend().setVisible(True)
+        self.line_chart.legend().setAlignment(Qt.AlignBottom)
+
+    def set_bar_chart_data(self, data=None):
+        self.bar_chart.removeAllSeries()
+        if isinstance(data, MonthData):
+            set_out = QBarSet('支出')
+            set_in = QBarSet('收入')
+            catg = []
+            for single_data in data.data:
+                date_day = single_data['date'].split('-')[-1]
+                catg.append(date_day)
+                money_type = single_data['type']
+                money = single_data['money']
+                if money_type == '支出':
+                    set_out.append(money)
+                else:
+                    set_in.append(money)
+            series = QBarSeries()
+            series.append(set_out)
+            series.append(set_in)
+
+            self.bar_chart.addSeries(series)
+            axis = QBarCategoryAxis()
+            axis.append(catg)
+            self.bar_chart.setAxisX(axis, series)
+        self.bar_chart.createDefaultAxes()
+        self.bar_chart.setAnimationOptions(QChart.SeriesAnimations)
+        self.setChart(self.bar_chart)
 
     def __init_pie_chart(self):
         pass

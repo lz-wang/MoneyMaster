@@ -10,10 +10,9 @@ from MoneyUI.MainWindow import MoenyMainWindow
 
 
 if __name__ == '__main__':
-    # run_gui()
     app = QApplication(sys.argv)
     window = MoenyMainWindow()
     window.show()
     sys.exit(app.exec_())
 
-# 访问 https://www.jetbrains.com/help/pycharm/ 获取 PyCharm 帮助
+# run_gui()
