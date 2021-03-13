@@ -125,8 +125,10 @@ class MySqlite(object):
         """
         索引指定月份的数据，统计每天支出或收入的总额
         """
+        _year = str(year)
+        _month = '0'+str(month) if month < 10 else str(month)
         sql = 'SELECT strftime(\'%Y-%m-%d\', trans_time), type, SUM(money) FROM ' + table_name + \
-              ' WHERE strftime(\'%Y%m\', trans_time)=\'' + str(year) + str(month) + \
+              ' WHERE strftime(\'%Y%m\', trans_time)=\'' + _year + _month + \
               '\' GROUP BY strftime(\'%Y%m%d\', trans_time), type'
         self.execute_sql(sql)
         return self.cur.fetchall()
@@ -135,7 +137,7 @@ class MySqlite(object):
         """
         索引指定年份的数据，统计每月支出或收入的总额
         """
-        sql = 'SELECT strftime(\'%Y-%m-%d\', trans_time), type, SUM(money) FROM ' + table_name + \
+        sql = 'SELECT strftime(\'%Y-%m\', trans_time), type, SUM(money) FROM ' + table_name + \
               ' WHERE strftime(\'%Y\', trans_time)=\'' + str(year) + \
               '\' GROUP BY strftime(\'%Y%m\', trans_time), type'
         self.execute_sql(sql)

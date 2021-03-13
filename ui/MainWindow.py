@@ -12,7 +12,8 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QMainWindow,
                              QMessageBox,
                              QHBoxLayout, QVBoxLayout, QGridLayout)
 
-from model.MoneyData import MonthData
+from model.MoneyData import MonthData, YearData
+from model.WechatPayModel import WechatPayDB
 from ui.DataChart import MoneyChartWidget
 from ui.DataTable import MoneyTableWidget
 from ui.TimeFilter import TimeFilterWidget
@@ -51,7 +52,7 @@ class MoenyMainWindow(QMainWindow):
         # de = datetime.datetime.strptime('2016-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
         # _db_data = self.wechat.db.query_by_trans_time(table_name=self.wechat.wechat_db.table_name,
         #                                               dt_start=ds, dt_end=de)
-        _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
+        _db_data = self.wechat.db.query_all_data(WechatPayDB().table_name)
         _table_head = list(self.wechat.wechat_db.table_attr.keys())
         self.table_widget = MoneyTableWidget(page_row=100, data=_db_data, head=_table_head)
         self.table_widget.setWindowTitle("表格视图")
@@ -61,7 +62,7 @@ class MoenyMainWindow(QMainWindow):
     def __init_line_chart_widget(self):
         # self.line_chart_data = MoneyChartData()
         self.line_chart_widget = MoneyChartWidget()
-        self.line_chart_widget.setWindowTitle('折线图')
+        self.line_chart_widget.setWindowTitle('柱状图')
 
     def __init_right_side(self):
         self.right_side = QWidget()
@@ -109,12 +110,18 @@ class MoenyMainWindow(QMainWindow):
 
     def _test_1(self):
         self.log.info('main windows')
-        y, m = 2020, 11
-        sql_result = self.wechat.db.query_by_month_trans_time_data(self.wechat.wechat_db.table_name, y, m)
-        m_data = MonthData(str(y) + '年' + str(m) + '月 支出数据')
-        m_data.from_sqlite(sql_result)
-        # self.line_chart_widget.set_line_chart_data(data=m_data)
-        self.line_chart_widget.set_bar_chart_data(data=m_data)
+        y, m = 2018, 2
+        # sql_result = self.wechat.db.query_by_month_trans_time_data(WechatPayDB().table_name, y, m)
+        # m_data = MonthData(str(y) + '年' + str(m) + '月 账单数据')
+        # m_data.from_sqlite(sql_result)
+        # print(sql_result)
+        # self.line_chart_widget.set_bar_chart_data(data=m_data)
+
+        sql_result_y = self.wechat.db.query_by_year_trans_time_data(WechatPayDB().table_name, y)
+        y_data = YearData(str(y) + '年 账单数据')
+        y_data.from_sqlite(sql_result_y)
+        self.log.info(y_data)
+        self.line_chart_widget.set_bar_chart_data(data=y_data)
 
     def _back_start(self):
         start_year = self.left_time_widget.start_year

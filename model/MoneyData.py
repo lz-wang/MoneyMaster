@@ -9,7 +9,7 @@ import re
 class MoneyData(object):
     def __init__(self, name='MONEY_DATA'):
         self.name = name
-        self.data = None
+        self.data = []
         self.date_type = '%Y-%m-%d %H:%M:%S'
 
     def from_sqlite(self, fetch_result=None, reload=True):
@@ -17,14 +17,41 @@ class MoneyData(object):
             return
         if reload:
             self.data.clear()
+        init_data = {
+            'date': 'error_date',
+            'money_in': 0,
+            'money_out': 0,
+            'money_others': 0
+        }
 
         for data in fetch_result:
-            single_data = {
-                'date': data[0],
-                'type': data[1],
-                'money': data[2]
-            }
-            self.data.append(single_data)
+            _date = data[0]
+            _type = data[1]
+            _money = round(data[2], 3)
+            if self.data == [] or self.data[-1]['date'] != _date:
+                self.add_date_data(_date)
+            self.set_money_data(_type, _money)
+
+        return self.data
+
+    def add_date_data(self, date):
+        init_data = {
+            'date': 'error_date',
+            'money_in': 0,
+            'money_out': 0,
+            'money_others': 0
+        }
+
+        self.data.append(init_data)
+        self.data[-1]['date'] = date
+
+    def set_money_data(self, money_type, money):
+        if money_type == '收入':
+            self.data[-1]['money_in'] = money
+        elif money_type == '支出':
+            self.data[-1]['money_out'] = money
+        elif money_type == '/':
+            self.data[-1]['money_others'] = money
 
 
 class MonthData(MoneyData):
@@ -35,4 +62,9 @@ class MonthData(MoneyData):
         self.data = []
 
 
-
+class YearData(MoneyData):
+    def __init__(self, name='YEAR_DATA'):
+        super().__init__()
+        self.name = name
+        self.date_type = '%Y-%m'
+        self.data = []
