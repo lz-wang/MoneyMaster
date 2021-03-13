@@ -3,8 +3,11 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/2 上午12:38
-from PyQt5.QtWidgets import *
+
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout,
+                             QPushButton, QLabel, QLineEdit, QTableWidgetItem)
+
 from ui.MoneyStyle import MONEY_TABLE_STYLE
 
 

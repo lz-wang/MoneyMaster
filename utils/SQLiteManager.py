@@ -3,9 +3,12 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/12 下午11:11
+
+import datetime
 import os
 import sqlite3
-import datetime
+import traceback
+
 from utils.LogManager import MoenyLogger
 
 
@@ -138,12 +141,13 @@ class MySqlite(object):
 
     def execute_sql(self, sql: str):
         try:
-            self.log.info('***** EXECUTE MYSQL: ' + sql)
+            self.log.info('***** EXECUTE SQLite: ' + sql)
             self.cur.execute(sql)
             self.con.commit()
-            self.log.info('***** MySQL RESULT: SUCCESS *****')
+            self.log.info('***** SQLite RESULT: SUCCESS *****')
         except Exception as e:
-            self.log.warning('***** MySQL RESULT: FAILED, REASON: %s' % e)
+            self.log.warning('***** SQLite RESULT: FAILED, REASON: %s' % e)
+            traceback.print_exc()
 
 
 if __name__ == '__main__':

@@ -3,12 +3,12 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/6 下午11:26
-import sys
-import calendar
-from datetime import datetime
-from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QGridLayout, QLabel, QHBoxLayout, QVBoxLayout
-from PyQt5.QtCore import QDateTime, QDate, QTime
 
+import calendar
+import sys
+from datetime import datetime
+
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QGridLayout, QLabel
 
 INIT_DATETIME = datetime.strptime('2000-01-01', '%Y-%m-%d')
 

@@ -3,18 +3,21 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/7 上午1:30
+
 from datetime import datetime
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QMainWindow,
                              QPushButton, QLabel, QSpacerItem, QSizePolicy,
                              QMessageBox,
                              QHBoxLayout, QVBoxLayout, QGridLayout)
-from PyQt5.QtCore import Qt
-from ui.DataTable import MoneyTableWidget
-from ui.DataChart import MoneyChartWidget
-from ui.TimeFilter import TimeFilterWidget
-from utils.WechatPayManager import DataManager
+
 from model.MoneyData import MonthData
+from ui.DataChart import MoneyChartWidget
+from ui.DataTable import MoneyTableWidget
+from ui.TimeFilter import TimeFilterWidget
 from utils.LogManager import MoenyLogger
+from utils.WechatPayManager import DataManager
 
 
 class MoenyMainWindow(QMainWindow):

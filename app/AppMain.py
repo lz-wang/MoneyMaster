@@ -5,12 +5,14 @@
 #  Last modified: 2021/3/13 下午9:43
 
 import sys
+
 from PyQt5.QtWidgets import QApplication
+
 from ui.MainWindow import MoenyMainWindow
 
 
 def run_app():
     app = QApplication(sys.argv)
-    window = MoenyMainWindow()
-    window.show()
+    app_window = MoenyMainWindow()
+    app_window.show()
     sys.exit(app.exec_())
