@@ -3,16 +3,9 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/7 上午12:14
-import sys
-from PyQt5.QtWidgets import QApplication
-from MoneyUI.TestUi import run_gui
-from MoneyUI.MainWindow import MoenyMainWindow
+
+from app import AppMain
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MoenyMainWindow()
-    window.show()
-    sys.exit(app.exec_())
-
-# run_gui()
+    AppMain.run_app()

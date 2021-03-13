@@ -2,11 +2,11 @@
 #  File info: SQLiteManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/6 下午11:54
+#  Last modified: 2021/3/12 下午11:11
 import os
 import sqlite3
 import datetime
-from utils.mylog import Logger
+from utils.LogManager import MoenyLogger
 
 
 class MySqlite(object):
@@ -14,11 +14,12 @@ class MySqlite(object):
     SQLite database API
     Reference: https://docs.python.org/zh-cn/3.8/library/sqlite3.html
     """
+
     def __init__(self, db_name: str):
         self.db_file_path = db_name
         self.con = None
         self.cur = None
-        self.log = Logger().logger
+        self.log = MoenyLogger().logger
 
     def connect_db(self):
         self.con = sqlite3.connect(database=self.db_file_path)
@@ -35,11 +36,9 @@ class MySqlite(object):
             self.disconnect_db()
         try:
             os.remove(self.db_file_path)
-            print('WARNING: Delete database [%s] SUCCESS.' %
-                  self.db_file_path.split('/')[-1])
+            self.log.warning('Delete database [%s] SUCCESS.' % self.db_file_path.split('/')[-1])
         except Exception as e:
-            print('WARNING: Delete database [%s] FAILED, REASON: %s' %
-                  (self.db_file_path.split('/')[-1], e))
+            self.log.error('Delete database [%s] FAILED, REASON: %s' % (self.db_file_path.split('/')[-1], e))
 
     def creat_table(self, table_name: str, table_attr: dict):
         _sql = 'CREATE TABLE ' + table_name + ' ('
@@ -148,8 +147,6 @@ class MySqlite(object):
 
 
 if __name__ == '__main__':
-    print('')
-
     # 连接 or 创建数据库
     db_file = os.getcwd() + '/test.db'
     db = MySqlite(db_file)

@@ -8,10 +8,9 @@ import os
 import sys
 
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox, QMainWindow,
-                             QGridLayout, QApplication, QFileDialog, QTableWidget, QTableWidgetItem)
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox, QGridLayout, QApplication, QFileDialog, QTableWidget, QTableWidgetItem)
 
-from WechatPay.WechatPayManager import DataManager
+from utils.WechatPayManager import DataManager
 
 
 class MMGui(QWidget):

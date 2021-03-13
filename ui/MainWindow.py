@@ -7,20 +7,21 @@ from datetime import datetime
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QMainWindow,
                              QPushButton, QLabel, QSpacerItem, QSizePolicy,
                              QMessageBox,
-                             QHBoxLayout, QVBoxLayout, QGridLayout, QFormLayout, QGroupBox)
+                             QHBoxLayout, QVBoxLayout, QGridLayout)
 from PyQt5.QtCore import Qt
-from MoneyUI.DataTable import MoneyTableWidget
-from MoneyUI.DataChart import MoneyChartWidget, MoneyChartData
-from MoneyUI.TimeFilter import TimeFilterWidget
-from WechatPay.WechatPayManager import DataManager
+from ui.DataTable import MoneyTableWidget
+from ui.DataChart import MoneyChartWidget
+from ui.TimeFilter import TimeFilterWidget
+from utils.WechatPayManager import DataManager
 from model.MoneyData import MonthData
+from utils.LogManager import MoenyLogger
 
 
 class MoenyMainWindow(QMainWindow):
     def __init__(self):
         super(MoenyMainWindow, self).__init__()
         self.wechat = DataManager()
-        self.log = self.wechat.log
+        self.log = MoenyLogger().logger
         self.__init_ui()
 
     def __init_ui(self):
@@ -34,7 +35,6 @@ class MoenyMainWindow(QMainWindow):
         self.left_widget = QTabWidget()
         self.left_widget.addTab(self.table_widget, self.table_widget.windowTitle())
         self.left_widget.addTab(self.line_chart_widget, self.line_chart_widget.windowTitle())
-        print(self.table_widget.windowTitle())
 
         self.hbox = QHBoxLayout()
         self.hbox.addWidget(self.left_widget)
@@ -105,10 +105,10 @@ class MoenyMainWindow(QMainWindow):
         self.time_widget.setLayout(grid)
 
     def _test_1(self):
+        self.log.info('main windows')
         y, m = 2020, 11
         sql_result = self.wechat.db.query_by_month_trans_time_data(self.wechat.wechat_db.table_name, y, m)
         m_data = MonthData(str(y) + '年' + str(m) + '月 支出数据')
-        print(sql_result)
         m_data.from_sqlite(sql_result)
         # self.line_chart_widget.set_line_chart_data(data=m_data)
         self.line_chart_widget.set_bar_chart_data(data=m_data)

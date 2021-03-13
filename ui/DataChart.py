@@ -3,30 +3,18 @@
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/7 上午1:28
-import random  # TODO: test only, to be removed
-import sys
 
 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarSet, QBarSeries, QBarCategoryAxis
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
 
 from model.MoneyData import MonthData
-
-
-class MoneyChartData(object):
-    def __init__(self):
-        self.source: str = ''
-        self.data: dict = {}  # {'in': 20, '}
-
-    def add_data(self, label: str = None, data: list = None):
-        if label is None:
-            label = 'NULL'
-        self.data[label] = data
+from utils.LogManager import MoenyLogger
 
 
 class MoneyChartWidget(QChartView):
     def __init__(self, chart_title: str = 'Default'):
         super().__init__()
+        self.log = MoenyLogger().logger
         self.chart_title = chart_title
         self.__init_line_chart()
         self.__init_bar_chart()
@@ -97,24 +85,3 @@ class MoneyChartWidget(QChartView):
 
     def draw_pie_chart(self):
         pass
-
-    def mock_data(self):
-        for i in range(3):
-            fake_data = [random.randint(0, 50) for _ in range(31)]
-            self.data['Month-' + str(i)] = fake_data
-
-
-def test():
-    mcd = MoneyChartData()
-    for i in range(3):
-        fake_data = [random.randint(0, 50) for _ in range(31)]
-        mcd.add_data(label='Month-'+str(i), data=fake_data)
-
-    app = QApplication(sys.argv)
-    mcw = MoneyChartWidget(chart_data=None)
-    mcw.show()
-    sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    test()

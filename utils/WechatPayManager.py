@@ -2,21 +2,20 @@
 #  File info: WechatPayManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/2 上午12:38
+#  Last modified: 2021/3/8 上午12:11
 import csv
 import os
 import re
 import time
-import copy
 
-from WechatPay.WechatPayModel import WechatPayData, WechatPayDB
-from MoneyDB.SQLiteManager import MySqlite
-from utils.mylog import Logger
+from model.WechatPayModel import WechatPayData, WechatPayDB
+from utils.SQLiteManager import MySqlite
+from utils.LogManager import MoenyLogger
 
 
 class DataManager:
     def __init__(self):
-        self.log = Logger(to_file=True).logger
+        self.log = MoenyLogger().logger
         self.csv_head = None
         self.wechat_data = WechatPayData()
         self.wechat_db = WechatPayDB()
@@ -29,7 +28,7 @@ class DataManager:
         self.wechat_data.data.clear()
         file_names = file_names_text.split('|')
         for file_name in file_names:
-            print(file_name)
+            self.log.info('Read WechatPay CSV file --> ' + file_name)
             with open(file_name) as f:
                 self.csv_head = None
                 f_csv = csv.reader(f)
@@ -40,14 +39,12 @@ class DataManager:
                         try:
                             _fmt_row0 = time.strptime(row[0], "%Y/%m/%d %H:%M")
                             row[0] = time.strftime("%Y-%m-%d %H:%M:%S", _fmt_row0)
-                            print(row[0])
                         except:
                             pass
                         row[5] = float(row[5][1:])
                         self.wechat_data.data.append(row)
                     if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
                         self.csv_head = next(f_csv)
-        print(self.wechat_data.data)
 
     def find_statistics(self, row_data):
         # 匹配方括号内的字符串
@@ -82,7 +79,7 @@ class DataManager:
 
     def write_data_to_db(self, data):
         self.log.info('--WRITE to DB---')
-        print(self.db_path)
+        self.log.info('DB path is ' + self.db_path)
         self.db.creat_table(self.wechat_db.table_name, self.wechat_db.table_attr)
         self.db.insert_data(self.wechat_db.table_name, data[1:])
 
@@ -94,12 +91,3 @@ class DataManager:
 
     def join_data(self):
         pass
-
-
-if __name__ == '__main__':
-    print('')
-    data_path = os.path.join(os.getcwd(), '../data')
-    wechat_data = data_path + '/wechat_test.csv'
-    wm = DataManager()
-    wm.log.info(wechat_data)
-    wm.read_csv_data(wechat_data)

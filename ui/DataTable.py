@@ -5,7 +5,7 @@
 #  Last modified: 2021/3/2 上午12:38
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSignal
-from MoneyUI.MoneyStyle import MONEY_TABLE_STYLE
+from ui.MoneyStyle import MONEY_TABLE_STYLE
 
 
 class MoneyTableWidget(QWidget):
