@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout,
                              QPushButton, QLabel, QLineEdit, QTableWidgetItem)
 
 from ui.MoneyStyle import MONEY_TABLE_STYLE
+from utils.LogManager import MoenyLogger
 
 
 class MoneyTableWidget(QWidget):
@@ -16,6 +17,7 @@ class MoneyTableWidget(QWidget):
 
     def __init__(self, page_row=20, data=None, head=None):
         super().__init__()
+        self.log = MoenyLogger().logger
         self.head = head
         self.total_data = data
         self.total_row = len(data)
@@ -50,7 +52,7 @@ class MoneyTableWidget(QWidget):
         self.final_page = QPushButton("尾页")
         self.total_page = QLabel("共" + str(self.page) + "页")
         self.skip_lable_0 = QLabel("跳到")
-        self.skip_page = QLineEdit()
+        self.skip_page_num = QLineEdit()
         self.skip_label_1 = QLabel("页")
         self.confirm_skip = QPushButton("确定")
         
@@ -68,7 +70,7 @@ class MoneyTableWidget(QWidget):
         self.page_control_hbox.addWidget(self.final_page)
         self.page_control_hbox.addWidget(self.total_page)
         self.page_control_hbox.addWidget(self.skip_lable_0)
-        self.page_control_hbox.addWidget(self.skip_page)
+        self.page_control_hbox.addWidget(self.skip_page_num)
         self.page_control_hbox.addWidget(self.skip_label_1)
         self.page_control_hbox.addWidget(self.confirm_skip)
         self.page_control_hbox.addStretch(1)
@@ -91,6 +93,7 @@ class MoneyTableWidget(QWidget):
     def set_page_data(self, page):
         if not 1 <= page <= self.page:
             return
+        self.log.info('Go to page %d/%d' % (page, self.page))
         self.table.clear()
         self.table.setHorizontalHeaderLabels(self.head)
         row_start = self.page_row * (page - 1)

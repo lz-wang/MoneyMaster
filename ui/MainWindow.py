@@ -163,25 +163,32 @@ class MoenyMainWindow(QMainWindow):
 
     def page_controller(self, signal):
         total_page = self.table_widget.page
-        if "first_page" == signal[0]:
+        btn_clicked = signal[0]
+        target_page = int(signal[1])
+        if btn_clicked == "first_page":
             self.table_widget.cur_page.setText("1")
-        elif "pre_page" == signal[0]:
-            if 1 == int(signal[1]):
+        elif btn_clicked == "pre_page":
+            if target_page == 1:
                 QMessageBox.information(self, "提示", "已经是第一页了", QMessageBox.Yes)
                 return
-            self.table_widget.cur_page.setText(str(int(signal[1]) - 1))
-        elif "next_page" == signal[0]:
-            if total_page == int(signal[1]):
+            self.table_widget.cur_page.setText(str(target_page - 1))
+        elif btn_clicked == "next_page":
+            if target_page == total_page:
                 QMessageBox.information(self, "提示", "已经是最后一页了", QMessageBox.Yes)
                 return
-            self.table_widget.cur_page.setText(str(int(signal[1]) + 1))
-        elif "final_page" == signal[0]:
+            self.table_widget.cur_page.setText(str(target_page + 1))
+        elif btn_clicked == "final_page":
             self.table_widget.cur_page.setText(str(total_page))
-        elif "skip_page" == signal[0]:
-            if total_page < int(signal[1]) or int(signal[1]) < 0:
+        elif btn_clicked == "skip_page":
+            try:
+                target_page = int(self.table_widget.skip_page_num.text())
+            except Exception as e:
+                self.log.info('skip_page error, REASON: %s' % e)
+                return
+            if target_page < 0 or target_page > total_page:
                 QMessageBox.information(self, "提示", "跳转页码超出范围", QMessageBox.Yes)
                 return
-            self.table_widget.cur_page.setText(signal[1])
+            self.table_widget.cur_page.setText(str(target_page))
 
         cur_page = int(self.table_widget.cur_page.text())
         self.update_table(page=cur_page)
