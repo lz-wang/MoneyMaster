@@ -2,11 +2,12 @@
 #  File info: DataChart.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/14 下午11:21
+#  Last modified: 2021/3/15 上午12:15
 
 import os
 from datetime import datetime
-from PyQt5.QtChart import QChart, QChartView, QLineSeries, QBarSet, QBarSeries, QBarCategoryAxis, QValueAxis
+from PyQt5.QtChart import (QChart, QChartView, QLineSeries, QSplineSeries,
+                           QBarSet, QBarSeries, QBarCategoryAxis, QValueAxis)
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QWidget, QCalendarWidget, QHBoxLayout, QVBoxLayout,
                              QLabel, QPushButton, QComboBox, QRadioButton, QCheckBox, QSpacerItem, QSizePolicy,
@@ -17,6 +18,15 @@ from utils.LogManager import MoenyLogger
 from utils.SQLiteManager import MySqlite
 
 PICK_ALL = '全部'
+LINE_CHART = '折线图'
+BAR_CHART = '柱状图'
+MONEY_IN = '收入'
+MONEY_OUT = '支出'
+MONEY_OTHERS = '其他'
+AXIS_DAY = '日期'
+AXIS_MONTH = '月份'
+AXIS_YEAR = '年份'
+AXIS_MONEY = '金额'
 
 
 class MoneyChartWidget(QWidget):
@@ -94,8 +104,11 @@ class MoneyChartWidget(QWidget):
         elif len(data.data) == 0:
             self.view = QLabel('[%s] 请求的日期范围无数据，请重试！' % datetime.now())
         else:
-            self.view = BarChart()
-            self.view.set_bar_chart_data(data)
+            if str(self.chart_picker.currentText()) == BAR_CHART:
+                self.view = BarChart()
+            elif str(self.chart_picker.currentText()) == LINE_CHART:
+                self.view = LineChart()
+            self.view.set_data(data)
 
         self.view.setAlignment(Qt.AlignCenter)
         self.gloabl_layout.addWidget(self.view)
@@ -115,9 +128,11 @@ class MoneyChartWidget(QWidget):
 
         self.account_picker.addItem(PICK_ALL)
         self.year_picker.addItem(PICK_ALL)
+        self.year_picker.setCurrentText(PICK_ALL)
         self.month_picker.addItem(PICK_ALL)
-        self.chart_picker.addItem('柱状图')
-        self.chart_picker.addItem('折线图')
+        self.month_picker.setCurrentText(PICK_ALL)
+        self.chart_picker.addItem(BAR_CHART)
+        self.chart_picker.addItem(LINE_CHART)
 
     def search_data(self):
         data, fetched_data = None, None
@@ -131,7 +146,6 @@ class MoneyChartWidget(QWidget):
         elif year == PICK_ALL:
             fetched_data = self.db.query_by_all_years_trans_time_data(table)
             data = AllYearsData()
-            print(data)
             data.from_sqlite(fetched_data)
         elif month == PICK_ALL:
             fetched_data = self.db.query_by_year_trans_time_data(table, int(year))
@@ -146,100 +160,10 @@ class MoneyChartWidget(QWidget):
             self.month_picker.setEnabled(True)
 
 
-class BarChart(QChartView):
+class MoneyChart(QChartView):
     def __init__(self):
         super().__init__()
         self.log = MoenyLogger().logger
-        self.chart_title = '数据纵览'
-        self.__init_line_chart()
-        self.__init_bar_chart()
-
-    def __init_line_chart(self):
-        self.line_chart = QChart()
-        self.line_chart.createDefaultAxes()
-        self.line_chart.setTitle(self.chart_title)
-        self.line_chart.legend().setVisible(True)
-        self.line_chart.legend().setAlignment(Qt.AlignBottom)
-
-    def set_line_chart_data(self, data=None):
-        if isinstance(data, MonthData):
-            series = QLineSeries()
-            series.setName(data.name)
-            for single_data in data.data:
-                date_day = int(single_data['date'].split('-')[-1])
-                money_type = single_data['type']
-                money = single_data['money']
-                if money_type == '支出':
-                    series.append(date_day, money)
-
-            self.line_chart.addSeries(series)
-        self.line_chart.createDefaultAxes()
-        self.setChart(self.line_chart)
-
-    def __init_bar_chart(self):
-        self.bar_chart = QChart()
-        self.bar_chart.setTitle(self.chart_title)
-        self.line_chart.legend().setVisible(True)
-        self.line_chart.legend().setAlignment(Qt.AlignBottom)
-
-    def set_bar_chart_data(self, data=None):
-        del self.bar_chart
-        self.__init_bar_chart()
-        set_in = QBarSet('收入')
-        set_out = QBarSet('支出')
-        set_other = QBarSet('其他')
-        category = []
-        money_max = 0
-
-        for single_data in data.data:
-            print(single_data)
-            date_label = single_data['date'].split('-')[-1]
-            category.append(date_label)
-            set_in.append(single_data['money_in'])
-            set_out.append(single_data['money_out'])
-            set_other.append(single_data['money_others'])
-            money_max = max(money_max, max(list(single_data.values())[1:]))
-            print(money_max)
-        money_max = self.beautify_money_max(money_max)
-
-        series = QBarSeries()
-        series.append(set_out)
-        series.append(set_in)
-        series.append(set_other)
-
-        self.bar_chart.addSeries(series)
-
-        axis_x = QBarCategoryAxis()
-        axis_x.append(category)
-        if isinstance(data, YearData):
-            axis_x.setTitleText('月份')
-        elif isinstance(data, MonthData):
-            axis_x.setTitleText('日期')
-        elif isinstance(data, AllYearsData):
-            axis_x.setTitleText('年份')
-        self.bar_chart.setAxisX(axis_x, series)
-
-        axis_y = QValueAxis()
-        axis_y.setRange(0, money_max)
-        axis_y.setTickCount(11)
-        axis_y.setTitleText('金额')
-        self.bar_chart.setAxisY(axis_y, series)
-
-        self.bar_chart.setAnimationOptions(QChart.SeriesAnimations)
-        self.bar_chart.setTitle(data.name)
-        self.setChart(self.bar_chart)
-
-    def __init_pie_chart(self):
-        pass
-
-    def draw_line_chart(self):
-        pass
-
-    def draw_bar_chart(self):
-        pass
-
-    def draw_pie_chart(self):
-        pass
 
     @staticmethod
     def beautify_money_max(money_max: int):
@@ -253,3 +177,115 @@ class BarChart(QChartView):
             money_max = (int(money_max / 100000) + 1) * 100000
 
         return money_max
+
+
+class BarChart(MoneyChart):
+    def __init__(self):
+        super().__init__()
+        self.chart_title = BAR_CHART
+        self.chart = QChart()
+        self.chart.setTitle(self.chart_title)
+
+    def set_data(self, data=None):
+        del self.chart
+        self.chart = QChart()
+
+        set_in = QBarSet(MONEY_IN)
+        set_out = QBarSet(MONEY_OUT)
+        set_other = QBarSet(MONEY_OTHERS)
+        category = []
+        money_max = 0
+
+        for single_data in data.data:
+            date_label = single_data['date'].split('-')[-1]
+            category.append(date_label)
+            set_in.append(single_data['money_in'])
+            set_out.append(single_data['money_out'])
+            set_other.append(single_data['money_others'])
+            money_max = max(money_max, max(list(single_data.values())[1:]))
+        money_max = self.beautify_money_max(money_max)
+
+        series = QBarSeries()
+        series.append(set_out)
+        series.append(set_in)
+        series.append(set_other)
+        self.chart.addSeries(series)
+
+        axis_x = QBarCategoryAxis()
+        axis_x.append(category)
+        if isinstance(data, MonthData):
+            axis_x.setTitleText(AXIS_DAY)
+        elif isinstance(data, YearData):
+            axis_x.setTitleText(AXIS_MONTH)
+        elif isinstance(data, AllYearsData):
+            axis_x.setTitleText(AXIS_YEAR)
+        self.chart.setAxisX(axis_x, series)
+
+        axis_y = QValueAxis()
+        axis_y.setRange(0, money_max)
+        axis_y.setTickCount(11)
+        axis_y.setTitleText(AXIS_MONEY)
+        self.chart.setAxisY(axis_y, series)
+
+        self.chart.setAnimationOptions(QChart.SeriesAnimations)
+        self.chart.setTitle(data.name)
+        self.setChart(self.chart)
+
+
+class LineChart(MoneyChart):
+    """
+    TODO: 待重构，重复代码过多
+    """
+    def __init__(self):
+        super().__init__()
+        self.chart_title = LINE_CHART
+        self.chart = QChart()
+        self.chart.setTitle(self.chart_title)
+        # self.chart.legend().setVisible(True)
+        # self.chart.legend().setAlignment(Qt.AlignBottom)
+
+    def set_data(self, data=None):
+        del self.chart
+        self.chart = QChart()
+        series_in = QLineSeries()
+        series_in.setName(MONEY_IN)
+        series_out = QLineSeries()
+        series_out.setName(MONEY_OUT)
+        series_others = QLineSeries()
+        series_others.setName(MONEY_OTHERS)
+
+        category = []
+        money_max = 0
+
+        for single_data in data.data:
+            date_label = single_data['date'].split('-')[-1]
+            category.append(date_label)
+            series_in.append(int(date_label), single_data['money_in'])
+            series_out.append(int(date_label), single_data['money_out'])
+            series_others.append(int(date_label), single_data['money_others'])
+            money_max = max(money_max, max(list(single_data.values())[1:]))
+        money_max = self.beautify_money_max(money_max)
+
+        self.chart.addSeries(series_in)
+        self.chart.addSeries(series_out)
+        self.chart.addSeries(series_others)
+
+        axis_x = QBarCategoryAxis()
+        axis_x.append(category)
+        if isinstance(data, MonthData):
+            axis_x.setTitleText(AXIS_DAY)
+        elif isinstance(data, YearData):
+            axis_x.setTitleText(AXIS_MONTH)
+        elif isinstance(data, AllYearsData):
+            axis_x.setTitleText(AXIS_YEAR)
+        self.chart.setAxisX(axis_x)
+
+        axis_y = QValueAxis()
+        axis_y.setRange(0, money_max)
+        axis_y.setTickCount(11)
+        axis_y.setTitleText(AXIS_MONEY)
+        self.chart.setAxisY(axis_y, series_in)
+
+        self.chart.setAnimationOptions(QChart.SeriesAnimations)
+        self.chart.setTitle(data.name)
+        self.setChart(self.chart)
