@@ -50,7 +50,7 @@ class MySqlite(object):
         sql = _sql[0:-2] + ')'
         self.execute_sql(sql)
 
-    def clear_table(self, table_name: str):
+    def delete_table(self, table_name: str):
         sql = 'DELETE FROM ' + table_name
         self.execute_sql(sql)
 
@@ -98,14 +98,16 @@ class MySqlite(object):
         pass
 
     def query_all_data(self, table_name: str):
-        """索引指定表的全部数据"""
+        """
+        索引指定表的全部数据
+        """
         sql = 'SELECT * FROM ' + table_name + ' ORDER BY trans_time DESC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
     def query_by_trans_time(self, table_name: str, dt_start=None, dt_end=None):
         """
-        根据时间段索引数据
+        查询给定时间段索的数据
         dt --> datetime --> fmt: %Y-%m-%d %H:%M:%S
         """
         if dt_start is None:
@@ -123,29 +125,48 @@ class MySqlite(object):
 
     def query_by_month_trans_time_data(self, table_name: str, year: int = 2020, month: int = 1):
         """
-        索引指定月份的数据，统计每天支出或收入的总额
+        查询指定月份的数据，统计每天支出或收入的总额
         """
         _year = str(year)
         _month = '0'+str(month) if month < 10 else str(month)
         sql = 'SELECT strftime(\'%Y-%m-%d\', trans_time), type, SUM(money) FROM ' + table_name + \
               ' WHERE strftime(\'%Y%m\', trans_time)=\'' + _year + _month + \
-              '\' GROUP BY strftime(\'%Y%m%d\', trans_time), type'
+              '\' GROUP BY strftime(\'%Y%m%d\', trans_time), type ORDER BY trans_time ASC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
     def query_by_year_trans_time_data(self, table_name: str, year: int = 2020):
         """
-        索引指定年份的数据，统计每月支出或收入的总额
+        查询指定年份的数据，统计每月支出或收入的总额
         """
         sql = 'SELECT strftime(\'%Y-%m\', trans_time), type, SUM(money) FROM ' + table_name + \
               ' WHERE strftime(\'%Y\', trans_time)=\'' + str(year) + \
-              '\' GROUP BY strftime(\'%Y%m\', trans_time), type'
+              '\' GROUP BY strftime(\'%Y%m\', trans_time), type ORDER BY trans_time ASC'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
-    def query_all_trans_time_data(self, table_name: str):
-        """索引全部交易时间的数据"""
+    def query_by_all_years_trans_time_data(self, table_name: str):
+        """
+        查询全部数据，统计每一年支出或收入的总额
+        """
+        sql = 'SELECT strftime(\'%Y\', trans_time), type, SUM(money) FROM ' + table_name + \
+              ' GROUP BY strftime(\'%Y\', trans_time), type ORDER BY trans_time ASC'
+        self.execute_sql(sql)
+        return self.cur.fetchall()
+
+    def query_date_range_of_all_data(self, table_name: str):
+        """
+        查询所有账单数据的时间范围
+        """
         sql = 'SELECT MIN(trans_time), MAX(trans_time) FROM ' + table_name + ' ORDER BY trans_time ASC'
+        self.execute_sql(sql)
+        return self.cur.fetchall()
+
+    def query_all_table_name(self):
+        """
+        查询数据库的所有表
+        """
+        sql = 'SELECT name FROM sqlite_master WHERE type =\'table\''
         self.execute_sql(sql)
         return self.cur.fetchall()
 
@@ -191,7 +212,7 @@ if __name__ == '__main__':
     db.insert_data(table_name=t_name, data=records)
 
     # 清空表数据
-    db.clear_table(table_name=t_name)
+    db.delete_table(table_name=t_name)
 
     # 删除表
     db.drop_table(table_name=t_name)

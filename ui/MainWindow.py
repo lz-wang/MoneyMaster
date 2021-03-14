@@ -32,37 +32,32 @@ class MoenyMainWindow(QMainWindow):
         self.resize(1200, 800)
         self.setWindowTitle("Money Master")
         # _db_data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
-        self.__init_money_table_widget()
-        self.__init_line_chart_widget()
+        self.__init_table_widget()
+        self.__init_chart_widget()
         self.__init_time_filter_group()
         self.__init_right_side()
-        self.left_widget = QTabWidget()
-        self.left_widget.addTab(self.table_widget, self.table_widget.windowTitle())
-        self.left_widget.addTab(self.line_chart_widget, self.line_chart_widget.windowTitle())
+        self.left_side = QTabWidget()
+        self.left_side.addTab(self.table_widget, self.table_widget.windowTitle())
+        self.left_side.addTab(self.chart_widget, self.chart_widget.windowTitle())
 
         self.hbox = QHBoxLayout()
-        self.hbox.addWidget(self.left_widget)
+        self.hbox.addWidget(self.left_side)
         self.hbox.addWidget(self.right_side)
         self.main_widget = QWidget()
         self.main_widget.setLayout(self.hbox)
         self.setCentralWidget(self.main_widget)
 
-    def __init_money_table_widget(self):
-        # ds = datetime.datetime.strptime('2015-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
-        # de = datetime.datetime.strptime('2016-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')
-        # _db_data = self.wechat.db.query_by_trans_time(table_name=self.wechat.wechat_db.table_name,
-        #                                               dt_start=ds, dt_end=de)
+    def __init_table_widget(self):
         _db_data = self.wechat.db.query_all_data(WechatPayDB().table_name)
         _table_head = list(self.wechat.wechat_db.table_attr.keys())
         self.table_widget = MoneyTableWidget(page_row=100, data=_db_data, head=_table_head)
-        self.table_widget.setWindowTitle("表格视图")
-        # self.table_widget.set_page_controller()
+        self.table_widget.setWindowTitle("数据库视图")
         self.table_widget.control_signal.connect(self.page_controller)
 
-    def __init_line_chart_widget(self):
+    def __init_chart_widget(self):
         # self.line_chart_data = MoneyChartData()
-        self.line_chart_widget = MoneyChartWidget()
-        self.line_chart_widget.setWindowTitle('柱状图')
+        self.chart_widget = MoneyChartWidget()
+        self.chart_widget.setWindowTitle('统计视图')
 
     def __init_right_side(self):
         self.right_side = QWidget()
@@ -89,7 +84,7 @@ class MoenyMainWindow(QMainWindow):
         self.to_end = QPushButton('去向最近')
         self.to_end.clicked.connect(self._to_end)
         self.change_order = QPushButton('切换顺序')
-        self.change_order.clicked.connect(self._change_order)
+        self.change_order.clicked.connect(self._reverse_order)
         self.query_db = QPushButton('查询数据库')
         self.query_db.clicked.connect(self._query_db)
         self.test_btn_1 = QPushButton('TEST 1')
@@ -110,7 +105,7 @@ class MoenyMainWindow(QMainWindow):
 
     def _test_1(self):
         self.log.info('main windows')
-        y, m = 2018, 2
+        y, m = 2016, 2
         # sql_result = self.wechat.db.query_by_month_trans_time_data(WechatPayDB().table_name, y, m)
         # m_data = MonthData(str(y) + '年' + str(m) + '月 账单数据')
         # m_data.from_sqlite(sql_result)
@@ -120,8 +115,7 @@ class MoenyMainWindow(QMainWindow):
         sql_result_y = self.wechat.db.query_by_year_trans_time_data(WechatPayDB().table_name, y)
         y_data = YearData(str(y) + '年 账单数据')
         y_data.from_sqlite(sql_result_y)
-        self.log.info(y_data)
-        self.line_chart_widget.set_bar_chart_data(data=y_data)
+        self.chart_widget.set_chart_view(data=y_data)
 
     def _back_start(self):
         start_year = self.left_time_widget.start_year
@@ -139,7 +133,7 @@ class MoenyMainWindow(QMainWindow):
         self.right_time_widget.month_combox.setCurrentText(str(end_month))
         self.right_time_widget.day_combox.setCurrentText(str(end_day))
 
-    def _change_order(self):
+    def _reverse_order(self):
         self.table_widget.total_data.reverse()
         self.table_widget.set_table_data()
 
@@ -156,13 +150,12 @@ class MoenyMainWindow(QMainWindow):
         end_str = end_year + '-' + end_month + '-' + end_day + ' 23:59:59'
         start = datetime.strptime(start_str, '%Y-%m-%d %H:%M:%S')
         end = datetime.strptime(end_str, '%Y-%m-%d %H:%M:%S')
-        data = self.wechat.db.query_by_trans_time(self.wechat.wechat_db.table_name,
-                                                  start, end)
+        data = self.wechat.db.query_by_trans_time(self.wechat.wechat_db.table_name, start, end)
 
         self.update_table(data=data)
 
     def __init_time_filter_widget(self):
-        data = self.wechat.db.query_all_trans_time_data(self.wechat.wechat_db.table_name)[0]
+        data = self.wechat.db.query_date_range_of_all_data(self.wechat.wechat_db.table_name)[0]
         self.start = datetime.strptime(data[0], '%Y-%m-%d %H:%M:%S')
         self.end = datetime.strptime(data[1], '%Y-%m-%d %H:%M:%S')
         self.left_time_widget = TimeFilterWidget(self.start, self.end, False)

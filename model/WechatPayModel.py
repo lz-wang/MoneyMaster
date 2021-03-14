@@ -2,7 +2,7 @@
 #  File info: WechatPayModel.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/2 上午12:38
+#  Last modified: 2021/3/7 上午1:32
 
 class WechatPayData(object):
     def __init__(self):
@@ -24,7 +24,7 @@ class WechatPayData(object):
 
 class WechatPayDB(object):
     def __init__(self):
-        self.db_name = 'Wehchat.db'
+        self.db_name = 'money.db'
         self.table_name = 'wechat'
         self.table_attr = {
             'trans_time': 'DATETIME NOT NULL',      # 交易时间

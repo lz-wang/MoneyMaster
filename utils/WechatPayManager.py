@@ -85,7 +85,7 @@ class DataManager:
         self.db.insert_data(self.wechat_db.table_name, data[1:])
 
     def clear_db_data(self):
-        self.db.clear_table(self.wechat_db.table_name)
+        self.db.delete_table(self.wechat_db.table_name)
 
     def clean_data(self):
         pass

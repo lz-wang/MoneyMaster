@@ -14,7 +14,7 @@ class MoneyData(object):
 
     def from_sqlite(self, fetch_result=None, reload=True):
         if not fetch_result:
-            return
+            return None
         if reload:
             self.data.clear()
         init_data = {
@@ -67,4 +67,12 @@ class YearData(MoneyData):
         super().__init__()
         self.name = name
         self.date_type = '%Y-%m'
+        self.data = []
+
+
+class AllYearsData(MoneyData):
+    def __init__(self, name='ALLYEAR_DATA'):
+        super().__init__()
+        self.name = name
+        self.date_type = '%Y'
         self.data = []
