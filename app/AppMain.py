@@ -9,6 +9,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from ui.MainWindow import MoenyMainWindow
+from ui.TestUI import *
 
 
 def run_app():
