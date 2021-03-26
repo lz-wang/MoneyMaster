@@ -7,56 +7,66 @@
 
 import sys
 from PyQt5.QtWidgets import *
-
-
 from PyQt5.QtCore import QSize, Qt
+from utils.ConfigManager import ConfigTool
 
 
-class LeftTabWidget(QWidget):
+class MainWindow(QMainWindow):
 
     def __init__(self):
-        super(LeftTabWidget, self).__init__()
-        self.setObjectName('LeftTabWidget')
+        super(MainWindow, self).__init__()
+        self.setWindowTitle('Money Master')
+        self.__init_ui()
+        self.__setup_ui()
 
-        self.setWindowTitle('LeftTabWidget')
-        with open('', 'r') as f:  # 导入QListWidget的qss样式
+    def _read_qss(self):
+        ct = ConfigTool()
+        cfg = ct.cfg_reader()
+        list_style_qss = cfg['stylesheet']['SideBar']
+        with open(list_style_qss, 'r') as f:
             self.list_style = f.read()
 
-        self.main_layout = QHBoxLayout(self, spacing=0)  # 窗口的整体布局
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
+    def __init_ui(self):
+        self._read_qss()
 
-        self.left_widget = QListWidget()  # 左侧选项列表
+        self.left_widget = QListWidget()
         self.left_widget.setStyleSheet(self.list_style)
-        self.main_layout.addWidget(self.left_widget)
-
         self.right_widget = QStackedWidget()
+
+        self.main_layout = QHBoxLayout()
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.addWidget(self.left_widget)
         self.main_layout.addWidget(self.right_widget)
+        self.main_widget = QWidget()
+        self.main_widget.setLayout(self.main_layout)
+        self.setCentralWidget(self.main_widget)
 
-        self._setup_ui()
+        self.resize(1000, 800)
 
-    def _setup_ui(self):
+    def __setup_ui(self):
         self.left_widget.currentRowChanged.connect(self.right_widget.setCurrentIndex)  # list和右侧窗口的index对应绑定
-
-        self.left_widget.setFrameShape(QListWidget.NoFrame)  # 去掉边框
-
-        self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # 隐藏滚动条
+        self.left_widget.setFrameShape(QListWidget.NoFrame)
+        self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        list_str = ['岗位需求', '专业要求', '薪水分布', '城市分布']
-        url_list = ['job_num_wordcloud.html', 'edu_need.html', 'salary_bar.html', 'edu_salary_bar.html']
+        label_items = ['HOME', 'DATABASE', 'STATICS', 'TODO']
+        content_items = [QWidget()] * len(label_items)
 
-        for i in range(4):
-            self.item = QListWidgetItem(list_str[i], self.left_widget)  # 左侧选项的添加
-            self.item.setSizeHint(QSize(30, 60))
-            self.item.setTextAlignment(Qt.AlignCenter)  # 居中显示
-            self.browser = QWidget()
-            self.right_widget.addWidget(self.browser)
+        for label, content in zip(label_items, content_items):
+            list_item = QListWidgetItem(label)
+            list_item.setSizeHint(QSize(30, 60))
+            list_item.setTextAlignment(Qt.AlignCenter)
+            self.left_widget.addItem(list_item)
+
+            self.right_widget.addWidget(content)
+
+        self.left_widget.setCurrentRow(0)
 
 
 def main():
     app = QApplication(sys.argv)
 
-    main_wnd = LeftTabWidget()
+    main_wnd = MainWindow()
     main_wnd.show()
 
     app.exec()

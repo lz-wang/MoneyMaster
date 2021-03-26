@@ -1,0 +1,3 @@
+stylesheet:
+  path: layout/stylesheet
+  SideBar: SideBar.qss

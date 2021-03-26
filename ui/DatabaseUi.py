@@ -158,7 +158,7 @@ class MMGui(QWidget):
         self.tedit_debug_console.setText(text)
 
 
-def run_gui():
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     mm = MMGui()
     sys.exit(app.exec_())
