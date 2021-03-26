@@ -2,7 +2,7 @@
 #  File info: DataTable.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/14 上午12:15
+#  Last modified: 2021/3/14 下午11:28
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout,
