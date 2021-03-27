@@ -23,9 +23,13 @@ class TimeFilterWidget(QWidget):
         self.start = start
         self.end = end
         self.is_end_primary = is_end_primary
+        self.layout = layout
         self.__init_datetime()
         self.__init_ui()
-        self.__setup_ui(layout)
+        self.__setup_ui(self.layout)
+
+    def reset_ui(self):
+        self.init_datetime()
 
     def __init_datetime(self):
         self.start_year = self.start.year
@@ -45,10 +49,6 @@ class TimeFilterWidget(QWidget):
         self.year_combox = QComboBox()
         for year in self.years:
             self.year_combox.addItem(str(year))
-        if not self.is_end_primary:
-            self.year_combox.setCurrentIndex(0)
-        else:
-            self.year_combox.setCurrentIndex(self.end_year-self.start_year)
         self.year_combox.currentTextChanged.connect(self.change_month)
 
         # init month
@@ -56,10 +56,6 @@ class TimeFilterWidget(QWidget):
         self.month_combox = QComboBox()
         for month in self.months:
             self.month_combox.addItem(str(month))
-        if not self.is_end_primary:
-            self.month_combox.setCurrentIndex(self.start_month-1)
-        else:
-            self.month_combox.setCurrentIndex(self.end_month-1)
         self.month_combox.currentTextChanged.connect(self.change_day)
 
         # init day
@@ -67,10 +63,18 @@ class TimeFilterWidget(QWidget):
         self.day_combox = QComboBox()
         for day in self.days:
             self.day_combox.addItem(str(day))
+
+        self.init_datetime()
+
+    def init_datetime(self):
         if not self.is_end_primary:
-            self.day_combox.setCurrentIndex(self.start_day-1)
+            self.year_combox.setCurrentText(str(self.start.year))
+            self.month_combox.setCurrentText(str(self.start.month))
+            self.day_combox.setCurrentText(str(self.start.day))
         else:
-            self.day_combox.setCurrentIndex(self.end_day-1)
+            self.year_combox.setCurrentText(str(self.end.year))
+            self.month_combox.setCurrentText(str(self.end.month))
+            self.day_combox.setCurrentText(str(self.end.day))
 
     def __setup_ui(self, layout='V'):
         if layout == 'V':
@@ -153,6 +157,6 @@ if __name__ == '__main__':
     # d = [x + 1 for x in range(31)]
     ds = datetime.strptime('2015-07-25 00:00:00', '%Y-%m-%d %H:%M:%S')
     de = datetime.strptime('2019-06-20 00:00:00', '%Y-%m-%d %H:%M:%S')
-    form = TimeFilterWidget(start=ds, end=de, is_end_primary=True, layout='H')
+    form = TimeFilterWidget(start=ds, end=de, is_end_primary=True)
     form.show()
     sys.exit(app.exec_())

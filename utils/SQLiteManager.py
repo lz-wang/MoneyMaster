@@ -172,11 +172,18 @@ class MySqlite(object):
 
     def show_table_info(self, table_name: str):
         """
-        获取指定表的所有列字段
+        获取指定表的所有列属性
         """
         sql = 'PRAGMA TABLE_INFO([' + table_name + '])'
         self.execute_sql(sql)
         return self.cur.fetchall()
+
+    def show_table_header(self, table_name: str):
+        """
+        获取指定表的所有列字段信息
+        """
+        table_info = self.show_table_info(table_name)
+        return [col[1] for col in table_info]
 
     def execute_sql(self, sql: str):
         try:

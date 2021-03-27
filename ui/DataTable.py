@@ -7,9 +7,11 @@
 import sys
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout, QApplication, QDialog,
-                             QPushButton, QLabel, QLineEdit, QTableWidgetItem, QMessageBox)
+                             QPushButton, QLabel, QLineEdit, QTableWidgetItem, QMessageBox, QGroupBox,
+                             QSpacerItem, QSizePolicy)
 
 from ui.MoneyStyle import MONEY_TABLE_STYLE
+from ui.TimeFilter import TimeFilterWidget
 from utils.LogManager import MoenyLogger
 from utils.ConfigManager import ConfigTool
 from utils.SQLiteManager import MySqlite
@@ -95,7 +97,6 @@ class MoneyTableWidget(QWidget):
         self.control_signal.emit(["skip_page", self.cur_page.text()])
 
     def page_controller(self, signal):
-        print(signal)
         total_page = self.page
         btn_clicked = signal[0]
         target_page = int(signal[1])
@@ -144,7 +145,9 @@ class MoneyTableWidget(QWidget):
                 item = QTableWidgetItem(str(page_data[r][c]))
                 self.table.setItem(r, c, item)
 
-    def set_table_data(self, data=None):
+    def set_table_data(self, data=None, header=None):
+        if header is not None:
+            self.table.setHorizontalHeaderLabels(header)
         if data is not None:
             self.total_data = data
         self.table.clear()
@@ -158,13 +161,6 @@ class MoneyTableWidget(QWidget):
 
     def show_total_page(self):
         return int(self.total_page.text()[1:-1])
-
-
-class DatabaseFilter(QDialog):
-    def __init__(self):
-        super().__init__()
-
-    def
 
 
 def setup_database(db_name='main'):
@@ -183,11 +179,11 @@ def setup_database(db_name='main'):
     default_table_header = [col[1] for col in default_table_desc]
     db.disconnect_db()
 
-    return db_tables, default_table_data, default_table_header
+    return default_table_data, default_table_header
 
 
 if __name__ == '__main__':
-    _tables, _data, _header = setup_database()
+    _data, _header = setup_database()
 
     app = QApplication(sys.argv)
 

@@ -9,6 +9,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QSize, Qt
 from utils.ConfigManager import ConfigTool
+from ui.DatabaseView import DatabaseView
 
 
 class MainWindow(QMainWindow):
@@ -50,7 +51,11 @@ class MainWindow(QMainWindow):
         self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         label_items = ['HOME', 'DATABASE', 'STATICS', 'TODO']
-        content_items = [QWidget()] * len(label_items)
+        home_widget = QWidget()
+        database_widget = DatabaseView()
+        statics_widget = QWidget()
+        todo_widget = QWidget()
+        content_items = [home_widget, database_widget, statics_widget, todo_widget]
 
         for label, content in zip(label_items, content_items):
             list_item = QListWidgetItem(label)
