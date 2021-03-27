@@ -1,3 +1,7 @@
 stylesheet:
   path: layout/stylesheet
   SideBar: SideBar.qss
+
+database:
+  path: data/database
+  main: money.db

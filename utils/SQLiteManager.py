@@ -18,14 +18,14 @@ class MySqlite(object):
     Reference: https://docs.python.org/zh-cn/3.8/library/sqlite3.html
     """
 
-    def __init__(self, db_name: str):
-        self.db_file_path = db_name
+    def __init__(self, db_path: str):
+        self.db_path = db_path
         self.con = None
         self.cur = None
         self.log = MoenyLogger().logger
 
     def connect_db(self):
-        self.con = sqlite3.connect(database=self.db_file_path)
+        self.con = sqlite3.connect(database=self.db_path)
         self.cur = self.con.cursor()
 
     def disconnect_db(self):
@@ -38,10 +38,10 @@ class MySqlite(object):
         if self.con is not None:
             self.disconnect_db()
         try:
-            os.remove(self.db_file_path)
-            self.log.warning('Delete database [%s] SUCCESS.' % self.db_file_path.split('/')[-1])
+            os.remove(self.db_path)
+            self.log.warning('Delete database [%s] SUCCESS.' % self.db_path.split('/')[-1])
         except Exception as e:
-            self.log.error('Delete database [%s] FAILED, REASON: %s' % (self.db_file_path.split('/')[-1], e))
+            self.log.error('Delete database [%s] FAILED, REASON: %s' % (self.db_path.split('/')[-1], e))
 
     def creat_table(self, table_name: str, table_attr: dict):
         _sql = 'CREATE TABLE ' + table_name + ' ('
@@ -162,11 +162,19 @@ class MySqlite(object):
         self.execute_sql(sql)
         return self.cur.fetchall()
 
-    def query_all_table_name(self):
+    def show_all_table_name(self):
         """
         查询数据库的所有表
         """
         sql = 'SELECT name FROM sqlite_master WHERE type =\'table\''
+        self.execute_sql(sql)
+        return self.cur.fetchall()
+
+    def show_table_info(self, table_name: str):
+        """
+        获取指定表的所有列字段
+        """
+        sql = 'PRAGMA TABLE_INFO([' + table_name + '])'
         self.execute_sql(sql)
         return self.cur.fetchall()
 
