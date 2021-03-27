@@ -4,12 +4,15 @@
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/14 下午11:28
 
+import sys
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout,
-                             QPushButton, QLabel, QLineEdit, QTableWidgetItem)
+from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout, QApplication, QDialog,
+                             QPushButton, QLabel, QLineEdit, QTableWidgetItem, QMessageBox)
 
 from ui.MoneyStyle import MONEY_TABLE_STYLE
 from utils.LogManager import MoenyLogger
+from utils.ConfigManager import ConfigTool
+from utils.SQLiteManager import MySqlite
 
 
 class MoneyTableWidget(QWidget):
@@ -35,6 +38,7 @@ class MoneyTableWidget(QWidget):
         self.setStyleSheet(MONEY_TABLE_STYLE)
         self.__init_data_table()
         self.__init_page_controller()
+        self.control_signal.connect(self.page_controller)
 
     def __init_data_table(self):
         self.table.setRowCount(self.page_row)
@@ -90,6 +94,37 @@ class MoneyTableWidget(QWidget):
     def _skip_page(self):
         self.control_signal.emit(["skip_page", self.cur_page.text()])
 
+    def page_controller(self, signal):
+        print(signal)
+        total_page = self.page
+        btn_clicked = signal[0]
+        target_page = int(signal[1])
+        if btn_clicked == "first_page":
+            self.cur_page.setText("1")
+        elif btn_clicked == "pre_page":
+            if target_page == 1:
+                QMessageBox.information(self, "提示", "已经是第一页了", QMessageBox.Yes)
+                return
+            self.cur_page.setText(str(target_page - 1))
+        elif btn_clicked == "next_page":
+            if target_page == total_page:
+                QMessageBox.information(self, "提示", "已经是最后一页了", QMessageBox.Yes)
+                return
+            self.cur_page.setText(str(target_page + 1))
+        elif btn_clicked == "final_page":
+            self.cur_page.setText(str(total_page))
+        elif btn_clicked == "skip_page":
+            try:
+                target_page = int(self.skip_page_num.text())
+            except Exception as e:
+                self.log.info('skip_page error, REASON: %s' % e)
+                return
+            if target_page < 0 or target_page > total_page:
+                QMessageBox.information(self, "提示", "跳转页码超出范围", QMessageBox.Yes)
+                return
+            self.cur_page.setText(str(target_page))
+        self.set_page_data(int(self.cur_page.text()))
+
     def set_page_data(self, page):
         if not 1 <= page <= self.page:
             return
@@ -123,3 +158,40 @@ class MoneyTableWidget(QWidget):
 
     def show_total_page(self):
         return int(self.total_page.text()[1:-1])
+
+
+class DatabaseFilter(QDialog):
+    def __init__(self):
+        super().__init__()
+
+    def
+
+
+def setup_database(db_name='main'):
+    ct = ConfigTool()
+    cfg = ct.cfg_reader()
+    db_path = cfg['database'][db_name]
+    db = MySqlite(db_path)
+    db.connect_db()
+    db_tables = db.show_all_table_name()[0]
+    if 'money' in db_tables:
+        default_table = 'money'
+    else:
+        default_table = db_tables[0]
+    default_table_data = db.query_all_data(default_table)
+    default_table_desc = db.show_table_info(default_table)
+    default_table_header = [col[1] for col in default_table_desc]
+    db.disconnect_db()
+
+    return db_tables, default_table_data, default_table_header
+
+
+if __name__ == '__main__':
+    _tables, _data, _header = setup_database()
+
+    app = QApplication(sys.argv)
+
+    main_wnd = MoneyTableWidget(page_row=50, data=_data, head=_header)
+    main_wnd.show()
+
+    app.exec()

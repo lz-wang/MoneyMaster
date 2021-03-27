@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         self.main_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.main_widget)
 
-        self.resize(1000, 800)
+        self.resize(1200, 800)
 
     def __setup_ui(self):
         self.left_widget.currentRowChanged.connect(self.right_widget.setCurrentIndex)  # list和右侧窗口的index对应绑定

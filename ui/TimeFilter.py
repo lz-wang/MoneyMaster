@@ -8,7 +8,7 @@ import calendar
 import sys
 from datetime import datetime
 
-from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QGridLayout, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QComboBox, QGridLayout, QLabel, QHBoxLayout, QSpacerItem, QSizePolicy
 
 INIT_DATETIME = datetime.strptime('2000-01-01', '%Y-%m-%d')
 
@@ -17,13 +17,15 @@ class TimeFilterWidget(QWidget):
     def __init__(self,
                  start: datetime = INIT_DATETIME,
                  end: datetime = datetime.now(),
-                 is_end_primary: bool = False):
+                 is_end_primary: bool = False,
+                 layout='V'):
         super().__init__()
         self.start = start
         self.end = end
         self.is_end_primary = is_end_primary
         self.__init_datetime()
         self.__init_ui()
+        self.__setup_ui(layout)
 
     def __init_datetime(self):
         self.start_year = self.start.year
@@ -70,16 +72,28 @@ class TimeFilterWidget(QWidget):
         else:
             self.day_combox.setCurrentIndex(self.end_day-1)
 
-        self.grid = QGridLayout()
-        self.grid.setSpacing(5)
-        self.grid.addWidget(self.year_label, 1, 1)
-        self.grid.addWidget(self.year_combox, 1, 2)
-        self.grid.addWidget(self.month_label, 2, 1)
-        self.grid.addWidget(self.month_combox, 2, 2)
-        self.grid.addWidget(self.day_label, 3, 1)
-        self.grid.addWidget(self.day_combox, 3, 2)
+    def __setup_ui(self, layout='V'):
+        if layout == 'V':
+            grid_layout = QGridLayout()
+            grid_layout.setSpacing(5)
+            grid_layout.addWidget(self.year_label, 1, 1)
+            grid_layout.addWidget(self.month_label, 2, 1)
+            grid_layout.addWidget(self.day_label, 3, 1)
+            grid_layout.addWidget(self.year_combox, 1, 2)
+            grid_layout.addWidget(self.month_combox, 2, 2)
+            grid_layout.addWidget(self.day_combox, 3, 2)
+            self._layout = grid_layout
+        else:
+            hbox_layout = QHBoxLayout()
+            spacer = QSpacerItem(5, 10, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            hbox_layout.addItem(spacer)
+            hbox_layout.addWidget(self.year_combox)
+            hbox_layout.addWidget(self.month_combox)
+            hbox_layout.addWidget(self.day_combox)
+            hbox_layout.addItem(spacer)
+            self._layout = hbox_layout
 
-        self.setLayout(self.grid)
+        self.setLayout(self._layout)
         self.change_month()
         self.change_day()
 
@@ -139,6 +153,6 @@ if __name__ == '__main__':
     # d = [x + 1 for x in range(31)]
     ds = datetime.strptime('2015-07-25 00:00:00', '%Y-%m-%d %H:%M:%S')
     de = datetime.strptime('2019-06-20 00:00:00', '%Y-%m-%d %H:%M:%S')
-    form = TimeFilterWidget(start=ds, end=de, is_end_primary=True)
+    form = TimeFilterWidget(start=ds, end=de, is_end_primary=True, layout='H')
     form.show()
     sys.exit(app.exec_())

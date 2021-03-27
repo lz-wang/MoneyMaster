@@ -114,7 +114,7 @@ class MoneyChartWidget(QWidget):
         self.gloabl_layout.addWidget(self.view)
 
     def init_combobox(self):
-        db_tables = self.db.query_all_table_name()[0]
+        db_tables = self.db.show_all_table_name()[0]
         for account in db_tables:
             self.account_picker.addItem(account)
 
