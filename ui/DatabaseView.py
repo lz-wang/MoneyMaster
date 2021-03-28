@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QDialog, QPushButton, QApplication, QHBoxL
                              QVBoxLayout, QGroupBox, QGridLayout, QLabel, QSpacerItem, QSizePolicy)
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import pyqtSignal
-from ui.DataTable import MoneyTableWidget, setup_database
+from ui.DataTable import MoneyTableWidget
 from ui.TimeFilter import TimeFilterWidget
 from utils.SQLiteManager import MySqlite
 from utils.ConfigManager import ConfigTool
@@ -47,8 +47,7 @@ class DatabaseView(QWidget):
         hbox_filter.addWidget(self.btn_filter)
         hbox_filter.addWidget(self.btn_refresh)
 
-        _data, _header = setup_database()
-        self.data_table = MoneyTableWidget(50, _data, _header)
+        self.data_table = MoneyTableWidget(50)
 
         vbox.addLayout(hbox_filter)
         vbox.addWidget(self.data_table)
@@ -81,7 +80,7 @@ class DatabaseFilter(QDialog):
 
     def __init_database(self):
         ct = ConfigTool()
-        db_path = ct.cfg_reader()['database']['main']
+        db_path = ct.cfg_reader()['paths']['database']['main']
         self.db = MySqlite(db_path)
         self.db.connect_db()
         # self.db_tables = self.db.show_all_table_name()[0]
@@ -173,8 +172,6 @@ class DatabaseFilter(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
     main_wnd = DatabaseView()
     main_wnd.show()
-
     app.exec()

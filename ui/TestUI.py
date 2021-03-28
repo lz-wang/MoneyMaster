@@ -23,7 +23,7 @@ class MainWindow(QMainWindow):
     def _read_qss(self):
         ct = ConfigTool()
         cfg = ct.cfg_reader()
-        list_style_qss = cfg['stylesheet']['SideBar']
+        list_style_qss = cfg['paths']['stylesheet']['SideBar']
         with open(list_style_qss, 'r') as f:
             self.list_style = f.read()
 

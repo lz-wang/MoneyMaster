@@ -5,13 +5,13 @@
 #  Last modified: 2021/3/14 下午11:28
 
 import sys
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout, QApplication, QDialog,
-                             QPushButton, QLabel, QLineEdit, QTableWidgetItem, QMessageBox, QGroupBox,
-                             QSpacerItem, QSizePolicy)
 
-from utils.LogManager import MoenyLogger
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout, QApplication, QPushButton, QLabel,
+                             QLineEdit, QTableWidgetItem, QMessageBox)
+
 from utils.ConfigManager import ConfigTool
+from utils.LogManager import MoenyLogger
 from utils.SQLiteManager import MySqlite
 
 
@@ -173,7 +173,7 @@ class MoneyTableWidget(QWidget):
         return int(self.total_page.text()[1:-1])
 
     def setup_database(self, db_name='main'):
-        db_path = self.cfg['database'][db_name]
+        db_path = self.cfg['paths']['database'][db_name]
         db = MySqlite(db_path)
         db.connect_db()
         db_tables = db.show_all_table_name()[0]
@@ -186,10 +186,11 @@ class MoneyTableWidget(QWidget):
         db.disconnect_db()
 
     def load_style_sheet(self):
-        style_sheet_qss = self.cfg['stylesheet']['TableStyle']
+        style_sheet_qss = self.cfg['paths']['stylesheet']['TableStyle']
         with open(style_sheet_qss, 'r') as f:
             table_style = f.read()
         return table_style
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
