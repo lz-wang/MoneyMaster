@@ -4,15 +4,18 @@
 #  Email: zhuangwang82@gmail.com
 #  Last modified: 2021/3/26 下午10:44
 
-
 import os
 import yaml
+from utils.LogManager import MoenyLogger
+
+CFG_YAML = 'layout/config/MoneyConfig.yaml'
 
 
 class ConfigTool(object):
     def __init__(self):
+        self.log = MoenyLogger().logger
         self.project_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
-        self.cfg_root = os.path.join(self.project_root, 'layout/config/MoneyConfig.yaml')
+        self.cfg_root = os.path.join(self.project_root, CFG_YAML)
 
     def run_test(self):
         cfg = self.cfg_reader()
@@ -26,24 +29,45 @@ class ConfigTool(object):
             with open(self.cfg_root, 'r') as f:
                 yaml_str = f.read()
                 cfg = yaml.safe_load(yaml_str)
-                print('read cfg SUCCESS')
+                self.log.info('read cfg SUCCESS')
                 return self.cfg_maker(cfg)
         except Exception as e:
-            print('read cfg Failed, REASON: %s' % e)
+            self.log.exception('read cfg Failed, REASON: %s' % e)
             return None
+    #
+    # def cfg_names_reader(self, cfg_yaml=None):
+    #     if cfg_yaml is not None:
+    #         self.cfg_root = cfg_yaml
+    #
+    #     try:
+    #         with open(self.cfg_root, 'r') as f:
+    #             yaml_str = f.read()
+    #             cfg = yaml.safe_load(yaml_str)
+    #             self.log.info('read cfg SUCCESS')
+    #             return self.cfg_paths_maker(cfg)
+    #     except Exception as e:
+    #         self.log.exception('read cfg Failed, REASON: %s' % e)
+    #         return None
 
-    def cfg_maker(self, cfg:dict):
-        cfg_abs: dict = {}
+    def cfg_maker(self, cfg: dict):
+        cfg_paths: dict = {}
+        cfg_names: dict = {}
 
-        for name, items in cfg.items():
-            cfg_abs[name]: dict = {}
-            cfg_abs[name]['root'] = os.path.join(self.project_root, items.get('path'))
-            for k, v in items.items():
-                if k == 'path':
-                    continue
-                cfg_abs[name][k] = cfg_abs[name]['root'] + '/' + v
+        for key, items in cfg.items():
+            if items.get('path'):
+                cfg_paths[key]: dict = {}
+                cfg_paths[key]['root'] = os.path.join(self.project_root, items.get('path'))
+                for k, v in items.items():
+                    if k == 'path':
+                        continue
+                    cfg_paths[key][k] = cfg_paths[key]['root'] + '/' + v
+            if items.get('names'):
+                cfg_names[key]: dict = {}
+                for _, all_names in items.items():
+                    for k, v in all_names.items():
+                        cfg_names[key][k] = v
 
-        return cfg_abs
+        return {'paths': cfg_paths, 'names': cfg_names}
 
 
 if __name__ == '__main__':

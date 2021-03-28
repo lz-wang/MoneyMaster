@@ -6,3 +6,16 @@ stylesheet:
 database:
   path: data/database
   main: money.db
+  
+datatable:
+  names:
+    PICK_ALL: 全部
+    LINE_CHART: 折线图
+    BAR_CHART: 柱状图
+    MONEY_IN: 收入
+    MONEY_OUT: 支出
+    MONEY_OTHERS: 其他
+    AXIS_DAY: 日期
+    AXIS_MONTH: 月份
+    AXIS_YEAR: 年份
+    AXIS_MONEY: 金额
