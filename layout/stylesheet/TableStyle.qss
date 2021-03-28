@@ -1,0 +1,8 @@
+QPushButton{
+    max-width: 18ex;
+    max-height: 6ex;
+    font-size: 11px;
+}
+QLineEdit{
+    max-width: 30px
+}

@@ -1,6 +1,7 @@
 stylesheet:
   path: layout/stylesheet
   SideBar: SideBar.qss
+  TableStyle: TableStyle.qss
 
 database:
   path: data/database

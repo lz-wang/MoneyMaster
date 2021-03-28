@@ -7,12 +7,13 @@ QListWidget {
     max-width: 120px;
     color: Black;
     background: #F5F5F5;
+    font-size: 15px;
 }
 
 QListWidget::Item:selected {
-    background: rgb(184, 219, 215);
-    border-left: 5px solid rgb(0, 193, 252);
-    border-right: 5px solid rgb(0, 193, 252);
+    background: rgb(0, 193, 252);
+    /* border-left: 5px solid rgb(0, 192, 80); */
+    /* border-right: 5px solid rgb(0, 193, 252); */
 }
 
 HistoryPanel:hover {

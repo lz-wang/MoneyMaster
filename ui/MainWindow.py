@@ -50,7 +50,7 @@ class MoenyMainWindow(QMainWindow):
     def __init_table_widget(self):
         _db_data = self.wechat.db.query_all_data(WechatPayDB().table_name)
         _table_head = list(self.wechat.wechat_db.table_attr.keys())
-        self.table_widget = MoneyTableWidget(page_row=100, data=_db_data, head=_table_head)
+        self.table_widget = MoneyTableWidget(page_row=100, data=_db_data, header=_table_head)
         self.table_widget.setWindowTitle("数据库视图")
         self.table_widget.control_signal.connect(self.page_controller)
 

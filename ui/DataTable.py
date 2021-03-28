@@ -10,8 +10,6 @@ from PyQt5.QtWidgets import (QWidget, QTableWidget, QHBoxLayout, QVBoxLayout, QA
                              QPushButton, QLabel, QLineEdit, QTableWidgetItem, QMessageBox, QGroupBox,
                              QSpacerItem, QSizePolicy)
 
-from ui.MoneyStyle import MONEY_TABLE_STYLE
-from ui.TimeFilter import TimeFilterWidget
 from utils.LogManager import MoenyLogger
 from utils.ConfigManager import ConfigTool
 from utils.SQLiteManager import MySqlite
@@ -20,32 +18,44 @@ from utils.SQLiteManager import MySqlite
 class MoneyTableWidget(QWidget):
     control_signal = pyqtSignal(list)
 
-    def __init__(self, page_row=20, data=None, head=None):
+    def __init__(self, page_row=20, data=None, header=None):
         super().__init__()
         self.log = MoenyLogger().logger
-        self.head = head
-        self.total_data = data
-        self.total_row = len(data)
-        self.total_col = len(data[0])
+        self.cfg = ConfigTool().cfg_reader()
         self.page_row = page_row
-        self.page_col = self.total_col
-        self.page = int(self.total_row/self.page_row) + 1
-        self.page_data = []
-        self.table = QTableWidget()
-        self.page_control_hbox = QHBoxLayout()
-        self.global_layout = QVBoxLayout()
-        self.global_layout.addWidget(self.table)
-        self.global_layout.addLayout(self.page_control_hbox)
-        self.setLayout(self.global_layout)
-        self.setStyleSheet(MONEY_TABLE_STYLE)
+
+        if data is None or header is None:
+            self.setup_database()
+        else:
+            self.header = header
+            self.total_data = data
+
+        self.__init_main_ui()
         self.__init_data_table()
         self.__init_page_controller()
         self.control_signal.connect(self.page_controller)
 
+    def __init_main_ui(self):
+        self.table = QTableWidget()
+        self.page_control_hbox = QHBoxLayout()
+
+        self.global_layout = QVBoxLayout()
+        self.global_layout.addWidget(self.table)
+        self.global_layout.addLayout(self.page_control_hbox)
+        self.setLayout(self.global_layout)
+        table_style = self.load_style_sheet()
+        self.setStyleSheet(table_style)
+
     def __init_data_table(self):
+        self.total_row = len(self.total_data)
+        self.total_col = len(self.total_data[0])
+        self.page_col = self.total_col
+        self.page = int(self.total_row / self.page_row) + 1
+        self.page_data = []
+
         self.table.setRowCount(self.page_row)
         self.table.setColumnCount(self.page_col)
-        self.table.setHorizontalHeaderLabels(self.head)
+        self.table.setHorizontalHeaderLabels(self.header)
         self.table.setShowGrid(True)
         # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.set_page_data(1)
@@ -131,7 +141,7 @@ class MoneyTableWidget(QWidget):
             return
         self.log.info('Go to page %d/%d' % (page, self.page))
         self.table.clear()
-        self.table.setHorizontalHeaderLabels(self.head)
+        self.table.setHorizontalHeaderLabels(self.header)
         row_start = self.page_row * (page - 1)
         row_end = row_start + self.page_row
         cur_page_row = self.page_row
@@ -151,7 +161,7 @@ class MoneyTableWidget(QWidget):
         if data is not None:
             self.total_data = data
         self.table.clear()
-        self.table.setHorizontalHeaderLabels(self.head)
+        self.table.setHorizontalHeaderLabels(self.header)
         self.total_row = len(self.total_data)
         self.page = int(self.total_row/self.page_row) + 1
         self.cur_page.setText('1')
@@ -162,32 +172,27 @@ class MoneyTableWidget(QWidget):
     def show_total_page(self):
         return int(self.total_page.text()[1:-1])
 
+    def setup_database(self, db_name='main'):
+        db_path = self.cfg['database'][db_name]
+        db = MySqlite(db_path)
+        db.connect_db()
+        db_tables = db.show_all_table_name()[0]
+        if 'money' in db_tables:
+            default_table = 'money'
+        else:
+            default_table = db_tables[0]
+        self.total_data = db.query_all_data(default_table)
+        self.header = db.show_table_header(default_table)
+        db.disconnect_db()
 
-def setup_database(db_name='main'):
-    ct = ConfigTool()
-    cfg = ct.cfg_reader()
-    db_path = cfg['database'][db_name]
-    db = MySqlite(db_path)
-    db.connect_db()
-    db_tables = db.show_all_table_name()[0]
-    if 'money' in db_tables:
-        default_table = 'money'
-    else:
-        default_table = db_tables[0]
-    default_table_data = db.query_all_data(default_table)
-    default_table_desc = db.show_table_info(default_table)
-    default_table_header = [col[1] for col in default_table_desc]
-    db.disconnect_db()
-
-    return default_table_data, default_table_header
-
+    def load_style_sheet(self):
+        style_sheet_qss = self.cfg['stylesheet']['TableStyle']
+        with open(style_sheet_qss, 'r') as f:
+            table_style = f.read()
+        return table_style
 
 if __name__ == '__main__':
-    _data, _header = setup_database()
-
     app = QApplication(sys.argv)
-
-    main_wnd = MoneyTableWidget(page_row=50, data=_data, head=_header)
+    main_wnd = MoneyTableWidget(page_row=50)
     main_wnd.show()
-
     app.exec()
