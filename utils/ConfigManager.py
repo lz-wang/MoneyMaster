@@ -2,20 +2,32 @@
 #  File info: ConfigManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/26 下午10:44
+#  Last modified: 2021/4/7 下午10:30
 
 import os
 import yaml
 from utils.LogManager import MoenyLogger
 
 CFG_YAML = 'layout/config/MoneyConfig.yaml'
+ROOT_KEY = 'MoneyMaster'
 
 
 class ConfigTool(object):
     def __init__(self):
         self.log = MoenyLogger().logger
-        self.project_root = os.path.abspath(os.path.join(os.getcwd(), ".."))
+        self.project_root = self.find_project_root()
         self.cfg_root = os.path.join(self.project_root, CFG_YAML)
+
+    @staticmethod
+    def find_project_root():
+        cwd = os.path.abspath(os.getcwd())
+        if os.name == 'posix':
+            a = cwd.split('/')
+            for idx, word in enumerate(a[::-1]):
+                if word == ROOT_KEY:
+                    a = a[:-idx]
+                    break
+            return '/'.join(a)
 
     def run_test(self):
         cfg = self.cfg_reader()
@@ -34,20 +46,6 @@ class ConfigTool(object):
         except Exception as e:
             self.log.exception('read cfg Failed, REASON: %s' % e)
             return None
-    #
-    # def cfg_names_reader(self, cfg_yaml=None):
-    #     if cfg_yaml is not None:
-    #         self.cfg_root = cfg_yaml
-    #
-    #     try:
-    #         with open(self.cfg_root, 'r') as f:
-    #             yaml_str = f.read()
-    #             cfg = yaml.safe_load(yaml_str)
-    #             self.log.info('read cfg SUCCESS')
-    #             return self.cfg_paths_maker(cfg)
-    #     except Exception as e:
-    #         self.log.exception('read cfg Failed, REASON: %s' % e)
-    #         return None
 
     def cfg_maker(self, cfg: dict):
         cfg_paths: dict = {}

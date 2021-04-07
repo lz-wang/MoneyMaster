@@ -2,7 +2,7 @@
 #  File info: DataChart.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/15 上午12:15
+#  Last modified: 2021/4/7 下午9:44
 
 import sys
 from datetime import datetime
@@ -18,10 +18,11 @@ from utils.SQLiteManager import MySqlite
 
 
 class MoneyChartWidget(QWidget):
-    def __init__(self):
+    def __init__(self, chart_type='BAR_CHART'):
         super().__init__()
         self.log = MoenyLogger().logger
         self.cfg = ConfigTool().cfg_reader()
+        self.chart_type = chart_type
         self.view = None
         self.__init_db()
         self.__init_names()
@@ -34,7 +35,6 @@ class MoneyChartWidget(QWidget):
 
     def __init_names(self):
         self.all_names = self.cfg['names']['datatable']
-        print(self.all_names)
 
     def __init_default_view(self):
         self.__init_chart_view()
@@ -46,12 +46,9 @@ class MoneyChartWidget(QWidget):
         self.gloabl_layout.addLayout(self.controller_layout)
         self.gloabl_layout.addWidget(self.view)
         self.setLayout(self.gloabl_layout)
+        self.query_data()
 
     def __init_view_controller(self):
-        self.chart_label = QLabel()
-        self.chart_label.setText('图表类型')
-        self.chart_picker = QComboBox()
-
         self.account_label = QLabel()
         self.account_label.setText('账户')
         self.account_picker = QComboBox()
@@ -72,9 +69,6 @@ class MoneyChartWidget(QWidget):
         self.search_btn.setText('查询数据')
         self.search_btn.clicked.connect(self.query_data)
 
-        self.controller_layout.addStretch(1)
-        self.controller_layout.addWidget(self.chart_label)
-        self.controller_layout.addWidget(self.chart_picker)
         self.controller_layout.addStretch(1)
         self.controller_layout.addWidget(self.account_label)
         self.controller_layout.addWidget(self.account_picker)
@@ -102,9 +96,9 @@ class MoneyChartWidget(QWidget):
         elif len(data.data) == 0:
             self.view = QLabel('[%s] 请求的日期范围无数据，请重试！' % datetime.now())
         else:
-            if str(self.chart_picker.currentText()) == self.all_names['BAR_CHART']:
+            if self.chart_type == 'BAR_CHART':
                 self.view = BarChart(self.all_names)
-            elif str(self.chart_picker.currentText()) == self.all_names['LINE_CHART']:
+            elif self.chart_type == 'LINE_CHART':
                 self.view = LineChart(self.all_names)
             self.view.set_data(data)
 
@@ -129,8 +123,6 @@ class MoneyChartWidget(QWidget):
         self.year_picker.setCurrentText(self.all_names['PICK_ALL'])
         self.month_picker.addItem(self.all_names['PICK_ALL'])
         self.month_picker.setCurrentText(self.all_names['PICK_ALL'])
-        self.chart_picker.addItem(self.all_names['BAR_CHART'])
-        self.chart_picker.addItem(self.all_names['LINE_CHART'])
 
     def query_data(self):
         data, fetched_data = None, None
