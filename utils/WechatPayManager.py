@@ -2,7 +2,7 @@
 #  File info: WechatPayManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/26 下午11:12
+#  Last modified: 2021/4/19 上午12:32
 
 import csv
 import os
@@ -12,6 +12,7 @@ import time
 from model.WechatPayModel import WechatPayData, WechatPayDB
 from utils.LogManager import MoenyLogger
 from utils.SQLiteManager import MySqlite
+from utils.ConfigManager import ConfigTool
 
 
 class DataManager:
@@ -20,7 +21,8 @@ class DataManager:
         self.csv_head = None
         self.wechat_data = WechatPayData()
         self.wechat_db = WechatPayDB()
-        self.db_path = os.path.join(os.getcwd(), 'data/database/'+self.wechat_db.db_name)
+        self.cfg = ConfigTool().cfg_reader()
+        self.db_path = self.cfg['paths']['database']['main']
         self.db = MySqlite(self.db_path)
         self.db.connect_db()
 

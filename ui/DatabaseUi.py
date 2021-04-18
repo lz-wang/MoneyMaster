@@ -2,18 +2,19 @@
 #  File info: DatabaseUi.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/26 下午11:12
+#  Last modified: 2021/4/19 上午12:32
 
 import os
 import sys
 
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox, QGridLayout, QApplication, QFileDialog, QTableWidget, QTableWidgetItem)
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox, QGridLayout, QApplication,
+                             QFileDialog, QTableWidget, QTableWidgetItem, QDialog, QHBoxLayout, QVBoxLayout)
 
 from utils.WechatPayManager import DataManager
 
 
-class MMGui(QWidget):
+class DatabaseDlg(QDialog):
     def __init__(self):
         # data process
         super().__init__()
@@ -38,7 +39,10 @@ class MMGui(QWidget):
         self.table_show_data = QTableWidget()
 
         # Layout
-        self.grid = QGridLayout()
+        self.global_layout = QHBoxLayout()
+        self.global_layout.setContentsMargins(1, 0, 1, 0)
+        self.edit_layout = QVBoxLayout()
+        self.btn_layout = QVBoxLayout()
 
         self.init_gui()
         
@@ -50,12 +54,10 @@ class MMGui(QWidget):
         self.init_layout()
         self.init_window()
 
-        self.show()
-
     def init_pushbutton(self):
         # 导入数据文件按钮
         self.btn_import_file_data.setText('导入文件')
-        self.btn_import_file_data.setToolTip('Import WechatPay or Alipay data')
+        self.btn_import_file_data.setToolTip('从文件中导入数据')
         self.btn_import_file_data.clicked.connect(self.import_data_file)
 
         # 读取数据按钮
@@ -89,14 +91,12 @@ class MMGui(QWidget):
         self.tedit_review.setText(review)
 
     def init_tablewidget(self):
-        # self.table_show_data.setVisible(False)
         pass
 
     def set_tablewidget(self, data):
         self.table_show_data.clear()
         self.table_show_data.setColumnCount(len(data[0]))
         self.table_show_data.setRowCount(len(data))
-        # self.table_show_data.setHorizontalHeaderLabels(self.wechat.csv_head)
         for i in range(len(data)):
             for j in range(len(data[0])):
                 item = QTableWidgetItem(str(data[i][j]))
@@ -104,32 +104,35 @@ class MMGui(QWidget):
 
     def init_layout(self):
         # 设置组件布局
-        self.grid.setSpacing(10)
-        self.grid.addWidget(self.ledit_path, 1, 0, 1, 6)
-        self.grid.addWidget(self.btn_import_file_data, 1, 7)
-        self.grid.addWidget(self.btn_read_file_data, 1, 8)
-        self.grid.addWidget(self.btn_read_db, 2, 7)
-        self.grid.addWidget(self.btn_write_db, 2, 8)
-        self.grid.addWidget(self.btn_clear_db, 3, 8)
-        self.grid.addWidget(self.tedit_review, 2, 0, 5, 6)
-        self.grid.addWidget(self.table_show_data, 5, 0, 6, 6)
-        self.setLayout(self.grid)
+        self.edit_layout.addWidget(self.ledit_path)
+        self.edit_layout.addWidget(self.tedit_review)
+        self.edit_layout.addWidget(self.table_show_data)
+
+        self.btn_layout.addWidget(self.btn_import_file_data)
+        self.btn_layout.addWidget(self.btn_read_file_data)
+        self.btn_layout.addStretch(1)
+        self.btn_layout.addWidget(self.btn_read_db)
+        self.btn_layout.addWidget(self.btn_write_db)
+        self.btn_layout.addWidget(self.btn_clear_db)
+
+        self.global_layout.addLayout(self.edit_layout)
+        self.global_layout.addLayout(self.btn_layout)
+        self.setLayout(self.global_layout)
 
     def init_window(self):
-        self.resize(1200, 1000)
-        self.setWindowTitle('Money Master')
+        self.setFixedSize(800, 500)
+        self.setWindowTitle('数据库管理器')
 
     def import_data_file(self):
         dialog = QFileDialog()
         f_name = dialog.getOpenFileNames(self, caption='CHOOSE DATA',
-                                         directory='/Users/lzwang/PyProjects/MoneyMaster/data/wechat/')[0]
+                                         directory='/Users/lzwang/PyProjects/MoneyMaster/data/')[0]
         f_name_text = '|'.join(f_name)
         if f_name:
             self.ledit_path.setText(f_name_text)
 
     def read_file_data(self):
         file_name = self.ledit_path.text()
-        # self.console_info('file name: ' + file_name)
         self.wechat.read_csv_data(file_name)
         self.set_data_review(self.wechat.wechat_data.statistics)
         self.set_tablewidget(self.wechat.wechat_data.data)
@@ -152,13 +155,14 @@ class MMGui(QWidget):
             self.log.warning('--- CLEAR DB DATA ---')
             self.wechat.clear_db_data()
 
-    def console_info(self, text):
-        print(text)
-        self.tedit_debug_console.setTextColor(QColor(200, 0, 0))
-        self.tedit_debug_console.setText(text)
+    def reset(self):
+        self.tedit_review.clear()
+        self.table_show_data.clear()
+        self.btn_write_db.setEnabled(False)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mm = MMGui()
+    mm = DatabaseDlg()
+    mm.show()
     sys.exit(app.exec_())

@@ -2,19 +2,21 @@
 #  File info: DatabaseView.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/28 下午8:28
+#  Last modified: 2021/4/19 上午12:32
 
 
 import sys
 from datetime import datetime
-from PyQt5.QtWidgets import (QWidget, QDialog, QPushButton, QApplication, QHBoxLayout,
-                             QVBoxLayout, QGroupBox, QGridLayout, QLabel, QSpacerItem, QSizePolicy)
+
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import (QWidget, QDialog, QPushButton, QApplication, QHBoxLayout,
+                             QVBoxLayout, QGroupBox, QLabel)
+
 from ui.DataTable import MoneyTableWidget
 from ui.TimeFilter import TimeFilterWidget
-from utils.SQLiteManager import MySqlite
 from utils.ConfigManager import ConfigTool
+from utils.SQLiteManager import MySqlite
 
 
 class DatabaseView(QWidget):
@@ -32,6 +34,7 @@ class DatabaseView(QWidget):
         self._init_filter()
         self.db_view = QWidget()
         vbox = QVBoxLayout()
+        vbox.setContentsMargins(0, 5, 0, 0)
 
         hbox_filter = QHBoxLayout()
         self.data_review = QLabel('数据概要')
@@ -52,7 +55,6 @@ class DatabaseView(QWidget):
         vbox.addLayout(hbox_filter)
         vbox.addWidget(self.data_table)
         self.setLayout(vbox)
-        # self.resize(500, 500)
 
     def _init_filter(self):
         self.db_filter = DatabaseFilter(self.data_signal)

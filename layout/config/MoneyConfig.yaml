@@ -2,11 +2,25 @@ stylesheet:
   path: layout/stylesheet
   SideBar: SideBar.qss
   TableStyle: TableStyle.qss
+  IconButton: IconButton.qss
 
 database:
   path: data/database
   main: money.db
-  
+
+alipaydata:
+  path: data/alipay
+  default: demo.csv
+
+wechatdata:
+  path: data/wechat
+  default: demo.csv
+
+icons:
+  path: icons
+  setting: setting.png
+  help: help.png
+
 datatable:
   names:
     PICK_ALL: 全部

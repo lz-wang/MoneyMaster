@@ -16,6 +16,6 @@ QListWidget::Item:selected {
     /* border-right: 5px solid rgb(0, 193, 252); */
 }
 
-HistoryPanel:hover {
-    background: rgb(52, 52, 52);
+QListWidget::Item:hover {
+    background: rgb(156, 230, 253);
 }

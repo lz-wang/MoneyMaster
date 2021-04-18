@@ -2,7 +2,7 @@
 #  File info: StatisticsView.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/7 下午9:40
+#  Last modified: 2021/4/19 上午12:32
 
 import sys
 from ui.DataChart import MoneyChartWidget

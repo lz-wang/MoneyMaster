@@ -2,7 +2,7 @@
 #  File info: DataTable.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/3/28 下午8:28
+#  Last modified: 2021/4/19 上午12:32
 
 import sys
 
@@ -38,8 +38,10 @@ class MoneyTableWidget(QWidget):
     def __init_main_ui(self):
         self.table = QTableWidget()
         self.page_control_hbox = QHBoxLayout()
+        self.page_control_hbox.setContentsMargins(0, 0, 0, 20)
 
         self.global_layout = QVBoxLayout()
+        self.global_layout.setContentsMargins(0, 0, 0, 0)
         self.global_layout.addWidget(self.table)
         self.global_layout.addLayout(self.page_control_hbox)
         self.setLayout(self.global_layout)
