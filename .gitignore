@@ -3,6 +3,15 @@ __pycache__
 .vscode
 .DS_Store
 logs/*
+
+!data/database
 data/database/*
+!data/database/demo.db
+
+!data/alipay
 data/alipay/*
+!data/alipay/alipay_demo.csv
+
+!data/wechat
 data/wechat/*
+!data/wechat/wechat_demo.csv
