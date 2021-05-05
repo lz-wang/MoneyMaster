@@ -85,11 +85,11 @@ class DatabaseFilter(QDialog):
         db_path = ct.cfg_reader()['paths']['database']['main']
         self.db = MySqlite(db_path)
         self.db.connect_db()
-        # self.db_tables = self.db.show_all_table_name()[0]
 
     def __init_parameters(self):
+        # TODO: 修复当数据库不存在时无法启动软件的问题
         tables = self.db.show_all_table_name()[0]
-        self.cur_db_table = tables[0]  # TODO: read from database view
+        self.cur_db_table = tables[0]
         self.cur_table_header = self.db.show_table_header(self.cur_db_table)
         time_range = self.db.query_date_range_of_all_data(tables[0])[0]
         self.start_time = datetime.strptime(time_range[0], '%Y-%m-%d %H:%M:%S')

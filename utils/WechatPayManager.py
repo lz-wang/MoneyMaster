@@ -41,16 +41,15 @@ class DataManager:
                         try:
                             _fmt_row0 = time.strptime(row[0], "%Y/%m/%d %H:%M")
                             row[0] = time.strftime("%Y-%m-%d %H:%M:%S", _fmt_row0)
-                        except:
-                            pass
+                        except Exception as e:
+                            self.log.exception('Exception in read csv data, REASON:', e)
                         row[5] = float(row[5][1:])
                         self.wechat_data.data.append(row)
                     if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
                         self.csv_head = next(f_csv)
 
     def find_statistics(self, row_data):
-        # 匹配方括号内的字符串
-        p1 = re.compile(f'[[](.*?)[]]')
+        p1 = re.compile(f'[[](.*?)[]]')  # 匹配方括号内的字符串
         # \d+ 匹配1次或者多次数字
         # \.? 匹配小数点的，可能有，也可能没有
         # \d* 匹配小数点之后的数字

@@ -8,10 +8,13 @@ import os
 import sys
 
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import (QWidget, QPushButton, QLineEdit, QTextEdit, QMessageBox, QGridLayout, QApplication,
+from PyQt5.QtWidgets import (QPushButton, QLineEdit, QTextEdit, QMessageBox, QApplication,
                              QFileDialog, QTableWidget, QTableWidgetItem, QDialog, QHBoxLayout, QVBoxLayout)
 
 from utils.WechatPayManager import DataManager
+from utils.LogManager import MoenyLogger
+from utils.ConfigManager import ConfigTool
+from utils.SQLiteManager import MySqlite
 
 
 class DatabaseDlg(QDialog):
@@ -19,7 +22,10 @@ class DatabaseDlg(QDialog):
         # data process
         super().__init__()
         self.wechat = DataManager()
-        self.log = self.wechat.log
+        self.log = MoenyLogger().logger
+        self.cfg = ConfigTool().cfg_reader()
+        self.db_path = self.cfg['paths']['database']['main']
+        self.db = MySqlite(self.db_path)
 
         # Push Button
         self.btn_import_file_data = QPushButton()
@@ -76,7 +82,7 @@ class DatabaseDlg(QDialog):
         self.btn_clear_db.clicked.connect(self.clear_db)
 
     def init_lineedit(self):
-        self.ledit_path.setPlaceholderText('请选择要导入的数据文件路径')
+        self.ledit_path.setPlaceholderText('请选择或输入要导入的数据文件路径')
 
     def init_textedit(self):
         self.tedit_review.setTextColor(QColor('#2c387e'))
@@ -143,6 +149,7 @@ class DatabaseDlg(QDialog):
         self.set_tablewidget(self.wechat.wechat_data.data)
         if not self.btn_write_db.isEnabled():
             self.btn_write_db.setEnabled(True)
+            self.tedit_review.setEnabled(True)
 
     def read_db(self):
         data = self.wechat.db.query_all_data(self.wechat.wechat_db.table_name)
@@ -155,10 +162,11 @@ class DatabaseDlg(QDialog):
             self.btn_clear_db.setEnabled(True)
 
     def clear_db(self):
-        reply = QMessageBox.warning(self, '警告', '清空数据库？', QMessageBox.Yes | QMessageBox.No)
+        warning_msg = '清空数据库？\n\n此操作将导致您的数据全部丢失且无法恢复！'
+        reply = QMessageBox.warning(self, '警告', warning_msg, QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.log.warning('--- CLEAR DB DATA ---')
-            self.wechat.clear_db_data()
+            self.db.delete_db()
 
     def reset(self):
         self.tedit_review.clear()
