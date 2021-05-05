@@ -5,7 +5,6 @@
 #  Last modified: 2021/4/19 上午12:32
 
 import csv
-import os
 import re
 import time
 
@@ -51,11 +50,11 @@ class DataManager:
 
     def find_statistics(self, row_data):
         # 匹配方括号内的字符串
-        p1 = re.compile(r'[[](.*?)[]]', re.S)
+        p1 = re.compile(f'[[](.*?)[]]')
         # \d+ 匹配1次或者多次数字
         # \.? 匹配小数点的，可能有，也可能没有
         # \d* 匹配小数点之后的数字
-        p2 = re.compile(r'\d+\.?\d*')
+        p2 = re.compile(f'\d+\.?\d*')
 
         for data in row_data:
             if data == '':
@@ -85,12 +84,3 @@ class DataManager:
         self.log.info('DB path is ' + self.db_path)
         self.db.creat_table(self.wechat_db.table_name, self.wechat_db.table_attr)
         self.db.insert_data(self.wechat_db.table_name, data[1:])
-
-    def clear_db_data(self):
-        self.db.delete_table(self.wechat_db.table_name)
-
-    def clean_data(self):
-        pass
-
-    def join_data(self):
-        pass

@@ -76,12 +76,12 @@ class DatabaseDlg(QDialog):
         self.btn_clear_db.clicked.connect(self.clear_db)
 
     def init_lineedit(self):
-        data_path = os.getcwd() + '/data'
-        wechat_demo = data_path + '/wechat/微信支付账单(20201001-20201231).csv'
-        self.ledit_path.setText(wechat_demo)
+        self.ledit_path.setPlaceholderText('请选择要导入的数据文件路径')
 
     def init_textedit(self):
         self.tedit_review.setTextColor(QColor('#2c387e'))
+        self.tedit_review.setPlaceholderText('此处显示导入的数据概览')
+        self.tedit_review.setEnabled(False)
 
     def set_data_review(self, data: dict):
         review = '---------Data Review:---------\n'
@@ -125,10 +125,15 @@ class DatabaseDlg(QDialog):
 
     def import_data_file(self):
         dialog = QFileDialog()
-        f_name = dialog.getOpenFileNames(self, caption='CHOOSE DATA',
-                                         directory='/Users/lzwang/PyProjects/MoneyMaster/data/')[0]
-        f_name_text = '|'.join(f_name)
-        if f_name:
+        current_ledit_path = self.ledit_path.text()
+        if os.path.exists(current_ledit_path):
+            default_path = current_ledit_path
+        else:
+            default_path = os.environ['HOME']
+        # 选择一组文件导入
+        file_names = dialog.getOpenFileNames(self, caption='CHOOSE DATA', directory=default_path)[0]
+        f_name_text = '|'.join(file_names)
+        if file_names:
             self.ledit_path.setText(f_name_text)
 
     def read_file_data(self):
