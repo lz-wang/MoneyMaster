@@ -2,7 +2,7 @@
 #  File info: SQLiteManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:32
+#  Last modified: 2021/5/7 下午11:29
 
 import datetime
 import os
@@ -25,16 +25,19 @@ class MySqlite(object):
         self.log = MoenyLogger().logger
 
     def connect_db(self):
+        """连接数据库"""
         self.con = sqlite3.connect(database=self.db_path)
         self.cur = self.con.cursor()
 
     def disconnect_db(self):
+        """断开数据库"""
         self.cur.close()
         self.con.close()
         self.con = None
         self.cur = None
 
     def delete_db(self):
+        """删除数据库文件"""
         if self.con is not None:
             self.disconnect_db()
         try:
@@ -44,6 +47,7 @@ class MySqlite(object):
             self.log.error('Delete database [%s] FAILED, REASON: %s' % (self.db_path.split('/')[-1], e))
 
     def creat_table(self, table_name: str, table_attr: dict):
+        """创建数据库表"""
         _sql = 'CREATE TABLE ' + table_name + ' ('
         for k, v in table_attr.items():
             _sql += k + ' ' + v + ', '
@@ -51,14 +55,17 @@ class MySqlite(object):
         self.execute_sql(sql)
 
     def delete_table(self, table_name: str):
+        """清空数据库表所有数据"""
         sql = 'DELETE FROM ' + table_name
         self.execute_sql(sql)
 
     def drop_table(self, table_name: str):
+        """删除数据库表"""
         sql = 'DROP TABLE ' + table_name
         self.execute_sql(sql)
 
     def insert_data(self, table_name: str, data):
+        """向指定数据库表写入单条或多条数据"""
         if isinstance(data, dict):
             self.insert_single_data(table_name, data)
         elif isinstance(data, list) or isinstance(data, tuple):
@@ -67,6 +74,10 @@ class MySqlite(object):
             raise Exception('insert data error')
 
     def insert_single_data(self, table_name: str, data: dict):
+        """
+        向指定数据库表写入单条数据\n
+        data --> 必须为字典类型
+        """
         _attr = ''
         _values = ''
         for k, v in data.items():
@@ -78,7 +89,7 @@ class MySqlite(object):
 
     def insert_multi_data(self, table_name: str, data):
         """
-        插入多条数据
+        插入多条数据\n
         data --> 可迭代的list或tuple
         """
         for r in data:
@@ -107,8 +118,8 @@ class MySqlite(object):
 
     def query_by_trans_time(self, table_name: str, dt_start=None, dt_end=None):
         """
-        查询给定时间段索的数据
-        dt --> datetime --> fmt: %Y-%m-%d %H:%M:%S
+        查询给定时间段索的数据\n
+        dt --> datetime (format: %Y-%m-%d %H:%M:%S)
         """
         if dt_start is None:
             start = '2000-01-01 00:00:00'
@@ -180,12 +191,19 @@ class MySqlite(object):
 
     def show_table_header(self, table_name: str):
         """
-        获取指定表的所有列字段信息
+        获取指定表的所有列字段信息\n
+        :param table_name: 数据库表的名称
+        :return: 指定数据库表的列字段名称
         """
         table_info = self.show_table_info(table_name)
         return [col[1] for col in table_info]
 
     def execute_sql(self, sql: str):
+        """
+        执行特定的数据库语句\n
+        :param sql: 数据库语句
+        :return: None
+        """
         try:
             self.log.info('***** EXECUTE SQLite: ' + sql)
             self.cur.execute(sql)
