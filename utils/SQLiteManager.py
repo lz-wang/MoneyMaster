@@ -179,7 +179,11 @@ class MySqlite(object):
         """
         sql = 'SELECT name FROM sqlite_master WHERE type =\'table\''
         self.execute_sql(sql)
-        return self.cur.fetchall()
+        raw_result = self.cur.fetchall()
+        result = []
+        for table in raw_result:
+            result.append(table[0])
+        return result
 
     def show_table_info(self, table_name: str):
         """
