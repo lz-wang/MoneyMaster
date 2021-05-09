@@ -5,14 +5,13 @@
 #  Last modified: 2021/5/9 下午9:53
 
 
-import csv
 import re
-import time
 
 from utils.LogManager import MoenyLogger
 from utils.SQLiteManager import MySqlite
 from utils.ConfigManager import ConfigTool
 from utils.WechatPayManager import WechatPayManager
+from utils.AliPayManager import AliPayManager
 from utils.AppChecker import Initializer
 
 
@@ -35,8 +34,12 @@ class DataManager(object):
                 raise TypeError(f'Known wechat data file type: {file_type}')
             data, review = wechat.csv_data, wechat.statistics
         elif data_type == '支付宝':
-            # TODO: fix it
-            data, review = None, None
+            alipay = AliPayManager()
+            if file_type == 'csv':
+                alipay.read_alipay_csv_data(data_file)
+            else:
+                raise TypeError(f'Known wechat data file type: {file_type}')
+            data, review = alipay.csv_data, alipay.statistics
         else:
             data, review = None, None
 
@@ -52,7 +55,7 @@ class DataManager(object):
         if data_type == '微信':
             table = WechatPayManager().db.table_name
         elif data_type == '支付宝':
-            table = WechatPayManager().db.table_name
+            table = AliPayManager().db.table_name
         else:
             raise TypeError(f'Known data type: {data_type}')
 

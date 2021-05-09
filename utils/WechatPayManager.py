@@ -9,22 +9,21 @@ import re
 import time
 
 from model.WechatPayModel import WechatPayData, WechatPayDatabase
+from utils.FilesManager import get_file_encoding
 
 
 class WechatPayManager(object):
     def __init__(self):
-        super().__init__()
         self.csv_head = None
-        self.statistics = dict()
+        self.statistics = WechatPayData().statistics
         self.csv_data = list()
         self.db = WechatPayDatabase()
 
     def read_wechat_csv_data(self, file_name):
         self.csv_data = []
-        # file_names = file_names_text.split('|')
-        # for file_name in file_names:
-        #     self.log.info('Read WechatPay CSV file --> ' + file_name)
-        with open(file_name) as f:
+        encoding = get_file_encoding(file_name)
+
+        with open(file_name, encoding=encoding) as f:
             self.csv_head = None
             f_csv = csv.reader(f)
             for row in f_csv:
@@ -41,7 +40,7 @@ class WechatPayManager(object):
                         raise Exception('Exception in read csv data, REASON: %s' % e)
                     row[5] = float(row[5][1:])
                     self.csv_data.append(row)
-                if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
+                if '-----' in row[0]:  # ----------------------微信支付账单明细列表
                     self.csv_head = next(f_csv)
 
         return self.csv_data
