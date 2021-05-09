@@ -2,17 +2,23 @@
 #  File info: AppMain.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:32
+#  Last modified: 2021/5/7 下午10:58
 
 import sys
 
 from PyQt5.QtWidgets import QApplication
 
 from ui.MainWindow import MoneyMainWindow
+from utils.AppChecker import Checker
 
 
 def run_app():
     app = QApplication(sys.argv)
-    main_wnd = MoneyMainWindow()
-    main_wnd.show()
+    app_ui = MoneyMainWindow()
+    app_ui.show()
     app.exec()
+
+
+def check_app():
+    app_checker = Checker()
+    app_checker.check_all()
