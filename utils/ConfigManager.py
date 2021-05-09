@@ -2,7 +2,7 @@
 #  File info: ConfigManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/7 下午10:30
+#  Last modified: 2021/4/19 上午12:31
 
 import os
 import yaml

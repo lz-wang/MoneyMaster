@@ -2,7 +2,7 @@
 #  File info: DataChart.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/7 下午9:44
+#  Last modified: 2021/5/8 下午11:06
 
 import sys
 from datetime import datetime
@@ -106,7 +106,7 @@ class MoneyChartWidget(QWidget):
         self.gloabl_layout.addWidget(self.view)
 
     def init_combobox(self):
-        db_tables = self.db.show_all_table_name()[0]
+        db_tables = self.db.show_all_table_name()
         for account in db_tables:
             self.account_picker.addItem(account)
 

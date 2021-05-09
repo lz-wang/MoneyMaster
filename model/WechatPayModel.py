@@ -2,7 +2,7 @@
 #  File info: WechatPayModel.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/5/8 上午12:25
+#  Last modified: 2021/5/8 下午11:27
 
 class WechatPayData(object):
     def __init__(self):
@@ -23,7 +23,7 @@ class WechatPayData(object):
         self.data: list = []
 
 
-class WechatPayDB(object):
+class WechatPayDatabase(object):
     def __init__(self):
         self.table_name = 'wechat'
         self.table_attr = {
@@ -32,7 +32,7 @@ class WechatPayDB(object):
             'trans_obj': 'VARCHAR(128) NOT NULL',   # 交易对方
             'commodity': 'VARCHAR(128) NOT NULL',   # 商品
             'type': 'VARCHAR(16) NOT NULL',         # 收支类型
-            'money': 'INT(11) NOT NULL',            # 金额
+            'money': 'REAL NOT NULL',               # 金额
             'pay_method': 'VARCHAR(64) NOT NULL',   # 支付方式
             'status': 'VARCHAR(64) NOT NULL',       # 当前状态
             'trans_id': 'VARCHAR(64) NOT NULL',     # 交易单号
@@ -41,15 +41,15 @@ class WechatPayDB(object):
         }
 
         self.test_data = {
-            'trans_time': '2019/12/31 16:54:47',
+            'trans_time': '2015-10-21 16:54:47',
             'trans_type': '商户消费',
             'trans_obj': '蜜雪冰城',
             'commodity': '销售单',
             'type': '支出',
-            'money': 25,
+            'money': 7.5,
             'pay_method': '工商银行(8888)',
             'status': '支付成功',
-            'trans_id': 4200000782942012315746749070,
-            'merchant_id': 1167798210211201231146827955,
+            'trans_id': 420000078299712315746749070,
+            'merchant_id': 1167798210211341231146827675,
             'readme': '/',
         }

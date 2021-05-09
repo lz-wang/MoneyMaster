@@ -2,7 +2,7 @@
 #  File info: TodoDialog.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:01
+#  Last modified: 2021/4/19 上午12:32
 
 from PyQt5.QtWidgets import QMessageBox
 

@@ -2,7 +2,7 @@
 #  File info: AppChecker.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/5/7 下午10:30
+#  Last modified: 2021/5/8 下午11:27
 
 import os
 
@@ -10,7 +10,7 @@ from utils.LogManager import MoenyLogger
 from utils.SQLiteManager import MySqlite
 from utils.ConfigManager import ConfigTool
 from utils.ExceptionManager import DatabaseError, ConfigError
-from model.WechatPayModel import WechatPayDB
+from model.WechatPayModel import WechatPayDatabase
 from model.AliPayModel import AliPayDB
 
 
@@ -65,10 +65,10 @@ class Initializer:
 
     def init_database_wechat(self, app_db):
         self.log.warning('init WechatPay database table')
-        wechat = WechatPayDB()
+        wechat = WechatPayDatabase()
         app_db.creat_table(wechat.table_name, wechat.table_attr)
         app_db.insert_data(wechat.table_name, wechat.test_data)
-        app_db.delete_table(wechat.table_name)
+        # app_db.delete_table(wechat.table_name)
         self.log.info('init WechatPay database table SUCCESS')
 
     def init_database_alipay(self, app_db):
@@ -76,7 +76,7 @@ class Initializer:
         alipay = AliPayDB()
         app_db.creat_table(alipay.table_name, alipay.table_attr)
         app_db.insert_data(alipay.table_name, alipay.test_data)
-        app_db.delete_table(alipay.table_name)
+        # app_db.delete_table(alipay.table_name)
         self.log.info('init AliPay database table SUCCESS')
 
     def init_config(self):

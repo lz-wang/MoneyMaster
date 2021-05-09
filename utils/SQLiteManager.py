@@ -2,7 +2,7 @@
 #  File info: SQLiteManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/5/9 下午9:49
+#  Last modified: 2021/5/9 下午10:44
 
 import datetime
 import os

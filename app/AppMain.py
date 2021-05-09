@@ -2,7 +2,7 @@
 #  File info: AppMain.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/5/7 下午10:58
+#  Last modified: 2021/5/9 下午10:47
 
 import sys
 

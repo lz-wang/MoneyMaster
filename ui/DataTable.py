@@ -2,7 +2,7 @@
 #  File info: DataTable.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:32
+#  Last modified: 2021/5/8 下午11:06
 
 import sys
 
@@ -178,7 +178,7 @@ class MoneyTableWidget(QWidget):
         db_path = self.cfg['paths']['database'][db_name]
         db = MySqlite(db_path)
         db.connect_db()
-        db_tables = db.show_all_table_name()[0]
+        db_tables = db.show_all_table_name()
         if 'money' in db_tables:
             default_table = 'money'
         else:

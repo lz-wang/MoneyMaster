@@ -2,7 +2,7 @@
 #  File info: DatabaseView.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:32
+#  Last modified: 2021/5/8 上午12:37
 
 
 import sys
@@ -88,7 +88,8 @@ class DatabaseFilter(QDialog):
 
     def __init_parameters(self):
         # TODO: 修复当数据库不存在时无法启动软件的问题
-        tables = self.db.show_all_table_name()[0]
+        tables = self.db.show_all_table_name()
+        print(tables)
         self.cur_db_table = tables[0]
         self.cur_table_header = self.db.show_table_header(self.cur_db_table)
         time_range = self.db.query_date_range_of_all_data(tables[0])[0]

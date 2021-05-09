@@ -2,7 +2,7 @@
 #  File info: AliPayModel.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/5/7 下午11:43
+#  Last modified: 2021/5/8 上午12:14
 
 
 class AliPayData(object):

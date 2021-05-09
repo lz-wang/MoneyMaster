@@ -2,7 +2,7 @@
 #  File info: MainWindow.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:32
+#  Last modified: 2021/5/8 下午11:44
 
 
 import sys
@@ -12,7 +12,7 @@ from PyQt5.QtCore import QSize, Qt
 from utils.ConfigManager import ConfigTool
 from ui.DatabaseView import DatabaseView
 from ui.StatisticsView import StaticsView
-from ui.DatabaseUi import DatabaseDlg
+from ui.DatabaseUi import DatabaseDialog
 from ui.TodoDialog import show_todo
 
 
@@ -40,7 +40,7 @@ class MoneyMainWindow(QMainWindow):
 
         self.func_list = QListWidget()
         self.icon_area = QWidget()
-        self.setting_dlg = DatabaseDlg()
+        self.setting_dlg = DatabaseDialog()
         self.setting_dlg.setWindowModality(Qt.ApplicationModal)
         self.left_layout = QVBoxLayout()
         self.left_layout.addWidget(self.func_list)
