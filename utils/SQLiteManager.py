@@ -2,7 +2,7 @@
 #  File info: SQLiteManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/5/7 下午11:29
+#  Last modified: 2021/5/9 下午9:49
 
 import datetime
 import os
@@ -100,7 +100,13 @@ class MySqlite(object):
             self.execute_sql(sql)
 
     def delete_data(self):
-        pass
+        """
+        清空数据库的所有表的所有记录，不删除表本身
+        """
+        tables = self.show_all_table_name()
+        print(tables)
+        for table in tables:
+            self.delete_table(table)
 
     def update_data(self):
         pass

@@ -2,84 +2,76 @@
 #  File info: WechatPayManager.py in MoneyMaster (version 0.1)
 #  Author: Liangzhuang Wang
 #  Email: zhuangwang82@gmail.com
-#  Last modified: 2021/4/19 上午12:32
+#  Last modified: 2021/5/9 下午6:05
 
 import csv
 import re
 import time
 
-from model.WechatPayModel import WechatPayData, WechatPayDB
-from utils.LogManager import MoenyLogger
-from utils.SQLiteManager import MySqlite
-from utils.ConfigManager import ConfigTool
+from model.WechatPayModel import WechatPayData, WechatPayDatabase
 
 
-class DataManager:
+class WechatPayManager(object):
     def __init__(self):
-        self.log = MoenyLogger().logger
+        super().__init__()
         self.csv_head = None
-        self.wechat_data = WechatPayData()
-        self.wechat_db = WechatPayDB()
-        self.cfg = ConfigTool().cfg_reader()
-        self.db_path = self.cfg['paths']['database']['main']
-        self.db = MySqlite(self.db_path)
-        self.db.connect_db()
+        self.statistics = dict()
+        self.csv_data = list()
+        self.db = WechatPayDatabase()
 
-    def read_csv_data(self, file_names_text):
-        self.wechat_data.statistics.clear()
-        self.wechat_data.data.clear()
-        file_names = file_names_text.split('|')
-        for file_name in file_names:
-            self.log.info('Read WechatPay CSV file --> ' + file_name)
-            with open(file_name) as f:
-                self.csv_head = None
-                f_csv = csv.reader(f)
-                for row in f_csv:
-                    if self.csv_head is None:
-                        self.find_statistics(row)
-                    else:
-                        try:
-                            _fmt_row0 = time.strptime(row[0], "%Y/%m/%d %H:%M")
-                            row[0] = time.strftime("%Y-%m-%d %H:%M:%S", _fmt_row0)
-                        except Exception as e:
-                            self.log.exception('Exception in read csv data, REASON:', e)
-                        row[5] = float(row[5][1:])
-                        self.wechat_data.data.append(row)
-                    if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
-                        self.csv_head = next(f_csv)
+    def read_wechat_csv_data(self, file_name):
+        self.csv_data = []
+        # file_names = file_names_text.split('|')
+        # for file_name in file_names:
+        #     self.log.info('Read WechatPay CSV file --> ' + file_name)
+        with open(file_name) as f:
+            self.csv_head = None
+            f_csv = csv.reader(f)
+            for row in f_csv:
+                if self.csv_head is None:
+                    self.find_statistics(row)
+                else:
+                    try:
+                        _fmt_row0 = time.strptime(row[0], "%Y/%m/%d %H:%M")
+                        row[0] = time.strftime("%Y-%m-%d %H:%M:%S", _fmt_row0)
+                    except ValueError:
+                        _fmt_row0 = time.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+                        row[0] = time.strftime("%Y-%m-%d %H:%M:%S", _fmt_row0)
+                    except Exception as e:
+                        raise Exception('Exception in read csv data, REASON: %s' % e)
+                    row[5] = float(row[5][1:])
+                    self.csv_data.append(row)
+                if row[0][0:5] == '-----':  # ----------------------微信支付账单明细列表
+                    self.csv_head = next(f_csv)
+
+        return self.csv_data
 
     def find_statistics(self, row_data):
-        p1 = re.compile(f'[[](.*?)[]]')  # 匹配方括号内的字符串
-        # \d+ 匹配1次或者多次数字
-        # \.? 匹配小数点的，可能有，也可能没有
-        # \d* 匹配小数点之后的数字
-        p2 = re.compile(f'\d+\.?\d*')
+        # 匹配方括号内的字符串
+        p1 = re.compile(r'\[(.*?)]')
+        # 匹配带有小数点的数字
+        p2 = re.compile(r'\d+\.?\d*')
 
         for data in row_data:
             if data == '':
                 continue
-            if data[0:4] == '微信昵称':
-                self.wechat_data.statistics['usr_name'] = re.findall(p1, data)[0]
-            elif data[0:4] == '起始时间':
-                self.wechat_data.statistics['start_time'] = re.findall(p1, data)[0]
-                self.wechat_data.statistics['end_time'] = re.findall(p1, data)[1]
-            elif data[0:4] == '导出时间':
-                self.wechat_data.statistics['export_time'] = re.findall(p1, data)[0]
+            if '微信昵称' in data:
+                self.statistics['usr_name'] = re.findall(p1, data)[0]
+            elif '起始时间' in data:
+                self.statistics['start_time'] = re.findall(p1, data)[0]
+                self.statistics['end_time'] = re.findall(p1, data)[1]
+            elif '导出时间' in data:
+                self.statistics['export_time'] = re.findall(p1, data)[0]
+            elif '共' in data:
+                self.statistics['trans_num'] = re.findall(p2, data)[0]
+            elif '收入：' in data:
+                self.statistics['income_num'] = re.findall(p2, data)[0]
+                self.statistics['income_amount'] = re.findall(p2, data)[1]
+            elif '支出：' in data:
+                self.statistics['expense_num'] = re.findall(p2, data)[0]
+                self.statistics['expense_amount'] = re.findall(p2, data)[1]
+            elif '中性交易：' in data:
+                self.statistics['other_num'] = re.findall(p2, data)[0]
+                self.statistics['other_amount'] = re.findall(p2, data)[1]
 
-            if data[0] == '共':
-                self.wechat_data.statistics['trans_num'] = re.findall(p2, data)[0]
-            elif data[0:2] == '收入':
-                self.wechat_data.statistics['income_num'] = re.findall(p2, data)[0]
-                self.wechat_data.statistics['income_amount'] = re.findall(p2, data)[1]
-            elif data[0:2] == '支出':
-                self.wechat_data.statistics['expense_num'] = re.findall(p2, data)[0]
-                self.wechat_data.statistics['expense_amount'] = re.findall(p2, data)[1]
-            elif data[0:2] == '中性':
-                self.wechat_data.statistics['other_num'] = re.findall(p2, data)[0]
-                self.wechat_data.statistics['other_amount'] = re.findall(p2, data)[1]
-
-    def write_data_to_db(self, data):
-        self.log.info('--WRITE to DB---')
-        self.log.info('DB path is ' + self.db_path)
-        self.db.creat_table(self.wechat_db.table_name, self.wechat_db.table_attr)
-        self.db.insert_data(self.wechat_db.table_name, data[1:])
+        return self.statistics
